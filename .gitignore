@@ -1,27 +1,6 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
+# =============================================================================
 # Flutter/Dart/Pub related
+# =============================================================================
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
@@ -43,7 +22,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# =============================================================================
 # iOS related
+# =============================================================================
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
 **/ios/**/*.moved-aside
@@ -72,152 +53,210 @@ app.*.map.json
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
-# macOS related
-**/macos/Flutter/GeneratedPluginRegistrant.swift
-
-# Coverage
-coverage/
-
-# Exceptions to above rules.
+# Exceptions to above rules
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 
+# =============================================================================
+# macOS related
+# =============================================================================
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# =============================================================================
 # Web related
+# =============================================================================
 lib/generated_plugin_registrant.dart
 
+# =============================================================================
 # Windows related
+# =============================================================================
 **/windows/flutter/generated_plugin_registrant.cc
 **/windows/flutter/generated_plugin_registrant.h
 **/windows/flutter/generated_plugins.cmake
 
+# =============================================================================
 # Linux related
+# =============================================================================
 **/linux/flutter/generated_plugin_registrant.cc
 **/linux/flutter/generated_plugin_registrant.h
 **/linux/flutter/generated_plugins.cmake
 
+# =============================================================================
+# Coverage
+# =============================================================================
+coverage/
+*.lcov
+.nyc_output
+
+# =============================================================================
 # FVM Version Cache
+# =============================================================================
 .fvm/
 
+# =============================================================================
 # Environment variables
+# =============================================================================
 .env
 .env.local
 .env.development
 .env.test
 .env.production
 
+# =============================================================================
 # Firebase
+# =============================================================================
 **/ios/firebase_app_id_file.json
 **/ios/GoogleService-Info.plist
 **/android/app/google-services.json
 **/android/app/google-services.json.bak
 
+# =============================================================================
 # Fastlane
+# =============================================================================
 **/fastlane/report.xml
 **/fastlane/Preview.html
 **/fastlane/screenshots
 **/fastlane/test_output
 
+# =============================================================================
 # Code Magic
+# =============================================================================
 **/.codemagic.yaml
 
+# =============================================================================
 # App Store Connect API Key
+# =============================================================================
 **/ios/AuthKey_*.p8
 
+# =============================================================================
 # Keystore files
+# =============================================================================
 **/*.jks
 **/*.keystore
 **/key.properties
 
+# =============================================================================
 # Local configuration files
+# =============================================================================
 **/local.properties
 
+# =============================================================================
 # Generated files
+# =============================================================================
 **/generated/
 
+# =============================================================================
 # Temporary files
+# =============================================================================
 *.tmp
 *.temp
+tmp/
+temp/
 
+# =============================================================================
 # Logs
-logs
+# =============================================================================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# =============================================================================
 # Runtime data
-pids
+# =============================================================================
+pids/
 *.pid
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
+# =============================================================================
 # Dependency directories
+# =============================================================================
 node_modules/
 
+# =============================================================================
 # Optional npm cache directory
+# =============================================================================
 .npm
 
+# =============================================================================
 # Optional eslint cache
+# =============================================================================
 .eslintcache
 
+# =============================================================================
 # Microbundle cache
+# =============================================================================
 .rpt2_cache/
 .rts2_cache_cjs/
 .rts2_cache_es/
 .rts2_cache_umd/
 
+# =============================================================================
 # Optional REPL history
+# =============================================================================
 .node_repl_history
 
+# =============================================================================
 # Output of 'npm pack'
+# =============================================================================
 *.tgz
 
+# =============================================================================
 # Yarn Integrity file
+# =============================================================================
 .yarn-integrity
 
-# parcel-bundler cache (https://parceljs.org/)
+# =============================================================================
+# parcel-bundler cache
+# =============================================================================
 .cache
 .parcel-cache
 
+# =============================================================================
 # Next.js build output
+# =============================================================================
 .next
 
+# =============================================================================
 # Nuxt.js build / generate output
+# =============================================================================
 .nuxt
-dist
+dist/
 
+# =============================================================================
 # Gatsby files
+# =============================================================================
 .cache/
-public
+public/
 
+# =============================================================================
 # Storybook build outputs
+# =============================================================================
 .out
 .storybook-out
 
-# Temporary folders
-tmp/
-temp/
-
+# =============================================================================
 # Editor directories and files
+# =============================================================================
 .vscode/*
 !.vscode/extensions.json
-.idea
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
+# =============================================================================
 # OS generated files
+# =============================================================================
 .DS_Store
 .DS_Store?
 ._*
@@ -225,8 +264,11 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
+Desktop.ini
 
+# =============================================================================
 # Audio Bookshelf UI specific
+# =============================================================================
 # Local audio files (if storing locally)
 /audio/
 /books/
@@ -270,138 +312,51 @@ build/
 dist/
 out/
 
-# Platform specific
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
+# Audio Bookshelf UI specific build outputs
+*.apk
+*.ipa
+*.app
+*.dmg
+*.exe
+*.msi
+*.deb
+*.rpm
+*.snap
 
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
+# CI/CD artifacts
+.github/workflows/secrets/
+.gitlab-ci.yml.local
+azure-pipelines.yml.local
 
-# Linux
-*~
+# Docker
+Dockerfile.local
+docker-compose.override.yml
+.dockerignore.local
 
-# JetBrains IDEs
-.idea/
-*.iml
-*.ipr
-*.iws
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
 
-# Visual Studio Code
-.vscode/
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# Kubernetes
+*.kubeconfig
+kubeconfig.*
 
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
+# Helm
+charts/*/charts/
+charts/*/requirements.lock
 
-# Vim
-*.swp
-*.swo
-*~
+# Local development tools
+.vscode/settings.json.local
+.vscode/launch.json.local
+.vscode/tasks.json.local
 
-# Emacs
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-auto-save-list
-tramp
-.\#*
+# Audio Bookshelf UI development
+dev_config/
+local_config/
+user_config/
 
-# Android Studio
-*.iml
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-
-# iOS
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-xcuserdata/
-*.moved-aside
-DerivedData/
-.idea/
-*.hmap
-*.xccheckout
-*.xcworkspace
-!default.xcworkspace
-
-# Flutter specific
-# These files will be generated by the Flutter SDK
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/profile
-**/ios/**/xcuserdata
-**/ios/.generated/
-**/ios/Flutter/App.framework
-**/ios/Flutter/Flutter.framework
-**/ios/Flutter/Flutter.podspec
-**/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/ephemeral/
-**/ios/Flutter/app.flx
-**/ios/Flutter/app.zip
-**/ios/Flutter/flutter_assets/
-**/ios/Flutter/flutter_export_environment.sh
-**/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
-
-# Web
-lib/generated_plugin_registrant.dart
-
-# Windows
-**/windows/flutter/generated_plugin_registrant.cc
-**/windows/flutter/generated_plugin_registrant.h
-**/windows/flutter/generated_plugins.cmake
-
-# Linux
-**/linux/flutter/generated_plugin_registrant.cc
-**/linux/flutter/generated_plugin_registrant.h
-**/linux/flutter/generated_plugins.cmake
-
-# macOS
-**/macos/Flutter/GeneratedPluginRegistrant.swift
-
-# Coverage
-coverage/
-
-# Exceptions to above rules.
-!**/ios/**/default.mode1v3
-!**/ios/**/default.mode2v3
-!**/ios/**/default.pbxuser
-!**/ios/**/default.perspectivev3
-
-# FVM Version Cache
-.fvm/
-
-# Audio Bookshelf UI specific exclusions
 # Local development overrides
 lib/config/local_config.dart
 lib/config/dev_config.dart
@@ -491,74 +446,50 @@ buildNumber.properties
 /nbdist/
 /.nb-gradle/
 
-# VS Code
-.vscode/
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-/build/
+# Vim
+*.swp
+*.swo
+*~
 
-# Symbolication related
-app.*.symbols
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
 
-# Obfuscation related
-app.*.map.json
+# Android Studio
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
 
-# Audio Bookshelf UI specific build outputs
-build/
-dist/
-*.apk
-*.ipa
-*.app
-*.dmg
-*.exe
-*.msi
-*.deb
-*.rpm
-*.snap
-
-# CI/CD artifacts
-.github/workflows/secrets/
-.gitlab-ci.yml.local
-azure-pipelines.yml.local
-
-# Docker
-Dockerfile.local
-docker-compose.override.yml
-.dockerignore.local
-
-# Terraform
-*.tfstate
-*.tfstate.*
-.terraform/
-.terraform.lock.hcl
-
-# Kubernetes
-*.kubeconfig
-kubeconfig.*
-
-# Helm
-charts/*/charts/
-charts/*/requirements.lock
-
-# Local development tools
-.vscode/settings.json.local
-.vscode/launch.json.local
-.vscode/tasks.json.local
-
-# Audio Bookshelf UI development
-dev_config/
-local_config/
-user_config/
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
