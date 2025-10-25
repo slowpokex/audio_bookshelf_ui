@@ -1,0 +1,88 @@
+{
+    "mcpServers": {
+      "dart-flutter": {
+        "command": "dart",
+        "args": [
+          "mcp-server",
+          "--force-roots-fallback"
+        ],
+        "env": {
+          "FLUTTER_PROJECT_ROOT": ".",
+          "DART_ANALYZER_OPTIONS": "--enable-experiment=macros"
+        }
+      },
+      "dart-code-metrics": {
+        "command": "metrics",
+        "args": [
+          "--reporter=console"
+        ]
+      },
+      "dart-analyzer": {
+        "command": "dart",
+        "args": [
+          "analyze"
+        ]
+      },
+      "dart-formatter": {
+        "command": "dart",
+        "args": [
+          "format"
+        ]
+      }
+    },
+    "projectSettings": {
+      "name": "Audio Bookshelf UI",
+      "type": "flutter",
+      "architecture": "clean-architecture",
+      "stateManagement": "bloc",
+      "platforms": ["android", "ios", "web", "desktop"],
+      "languages": ["en", "ru"],
+      "features": [
+        "audio-playback",
+        "ai-recommendations", 
+        "offline-support",
+        "background-audio",
+        "push-notifications",
+        "deep-linking",
+        "biometric-auth",
+        "carplay-android-auto"
+      ],
+      "dependencies": [
+        "flutter_bloc",
+        "just_audio",
+        "audio_service",
+        "firebase_messaging",
+        "go_router",
+        "flutter_localizations",
+        "intl"
+      ]
+    },
+    "cursorIntegration": {
+      "codeGeneration": {
+        "patterns": ["bloc", "riverpod", "clean_architecture"],
+        "testing": true,
+        "documentation": true,
+        "accessibility": true,
+        "performance": true
+      },
+      "audioFeatures": {
+        "playbackControls": true,
+        "progressTracking": true,
+        "backgroundPlayback": true,
+        "sleepTimer": true,
+        "speedControl": true
+      },
+      "aiIntegration": {
+        "recommendations": true,
+        "voiceCommands": true,
+        "contentAnalysis": true,
+        "searchEnhancement": true
+      },
+      "i18n": {
+        "languages": ["en", "ru"],
+        "rtlSupport": false,
+        "pluralization": true,
+        "contextAware": true
+      }
+    }
+  }
