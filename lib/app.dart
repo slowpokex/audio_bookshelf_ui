@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import 'core/constants/app_constants.dart';
 import 'presentation/pages/home_page.dart';
+import 'presentation/widgets/loading/splash_screen.dart';
 import 'presentation/blocs/audiobook/audiobook_bloc.dart';
 import 'application/use_cases/audiobook_use_cases.dart';
 import 'infrastructure/repositories/audiobook_repository_impl.dart';
@@ -63,8 +64,13 @@ class AudioBookshelfApp extends StatelessWidget {
 
 /// Router configuration
 final GoRouter _router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/splash',
   routes: [
+    GoRoute(
+      path: '/splash',
+      name: 'splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: '/',
       name: 'home',

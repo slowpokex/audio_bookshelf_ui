@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../blocs/audiobook/audiobook_bloc.dart';
+import '../widgets/loading/simple_loading_widget.dart';
+import '../widgets/common/app_icon.dart';
 
 /// Home page displaying the audiobook library
 class HomePage extends StatefulWidget {
@@ -106,7 +108,13 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Audio Bookshelf'),
+        title: Row(
+          children: [
+            const AppBarIcon(),
+            const SizedBox(width: 12),
+            const Text('Audio Bookshelf'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -189,8 +197,9 @@ class _HomePageState extends State<HomePage> {
             child: BlocBuilder<AudiobookBloc, AudiobookState>(
               builder: (context, state) {
                 if (state is AudiobookLoadingState) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  return const SimpleLoadingWidget(
+                    message: 'Loading your audiobook library...',
+                    showLogo: true,
                   );
                 } else if (state is AudiobookErrorState) {
                   return Center(
