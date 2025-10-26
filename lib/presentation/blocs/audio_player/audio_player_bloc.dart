@@ -44,6 +44,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     on<PlayerErrorEvent>(_onPlayerError);
     on<ClearErrorEvent>(_onClearError);
     on<UpdateCurrentAudiobookEvent>(_onUpdateCurrentAudiobook);
+    on<UpdatePlaybackSpeedEvent>(_onUpdatePlaybackSpeed);
 
     // Initialize the audio player service
     add(const InitializeAudioPlayerEvent());
@@ -60,7 +61,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       await _audioPlayerService.initialize();
       
       // Set up stream subscriptions
-      _setupStreamSubscriptions(emit);
+      _setupStreamSubscriptions();
       
       emit(state.copyWith(
         isInitialized: true,
@@ -101,15 +102,15 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
   }
 
   /// Set up stream subscriptions
-  void _setupStreamSubscriptions(Emitter<AudioPlayerState> emit) {
+  void _setupStreamSubscriptions() {
     // Current audiobook subscription
     _currentAudiobookSubscription = _audioPlayerService.currentAudiobookStream.listen(
-      (audiobook) async {
+      (audiobook) {
         if (!isClosed) {
           add(UpdateCurrentAudiobookEvent(audiobook));
         }
       },
-      onError: (error) async {
+      onError: (error) {
         if (!isClosed) {
           add(PlayerErrorEvent(error.toString()));
         }
@@ -176,7 +177,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     _playbackSpeedSubscription = _audioPlayerService.playbackSpeedStream.listen(
       (speed) {
         if (!isClosed) {
-          emit(state.copyWith(playbackSpeed: speed));
+          add(UpdatePlaybackSpeedEvent(speed));
         }
       },
       onError: (error) {
@@ -422,6 +423,14 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     Emitter<AudioPlayerState> emit,
   ) {
     emit(state.copyWith(currentAudiobook: event.audiobook));
+  }
+
+  /// Update playback speed
+  void _onUpdatePlaybackSpeed(
+    UpdatePlaybackSpeedEvent event,
+    Emitter<AudioPlayerState> emit,
+  ) {
+    emit(state.copyWith(playbackSpeed: event.speed));
   }
 
   @override

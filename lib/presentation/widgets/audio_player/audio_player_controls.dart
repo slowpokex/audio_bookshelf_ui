@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:ui';
 import '../../../presentation/blocs/audio_player/audio_player_bloc.dart';
 import '../../../presentation/blocs/audio_player/audio_player_event.dart';
 import '../../../presentation/blocs/audio_player/audio_player_state.dart';
@@ -26,36 +27,51 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
         }
 
         return Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, -8),
               ),
             ],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Progress bar with enhanced features
-              _buildProgressBar(context, state),
-              const SizedBox(height: 16),
-              
-              // Main controls with accessibility
-              _buildMainControls(context, state),
-              const SizedBox(height: 16),
-              
-              // Secondary controls
-              _buildSecondaryControls(context, state),
-              const SizedBox(height: 8),
-              
-              // Chapter navigation (if available)
-              _buildChapterNavigation(context, state),
-            ],
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Progress bar with enhanced features
+                    _buildProgressBar(context, state),
+                    const SizedBox(height: 20),
+                    
+                    // Main controls with accessibility
+                    _buildMainControls(context, state),
+                    const SizedBox(height: 20),
+                    
+                    // Secondary controls
+                    _buildSecondaryControls(context, state),
+                    const SizedBox(height: 12),
+                    
+                    // Chapter navigation (if available)
+                    _buildChapterNavigation(context, state),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
       },
@@ -371,34 +387,51 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
       label: state.isPlaying ? 'Pause' : 'Play',
       button: true,
       enabled: !state.isLoadingState,
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white, // White circle like in the image
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(35),
             onTap: state.isLoadingState ? null : () {
               context.read<AudioPlayerBloc>().add(const TogglePlayPauseEvent());
               HapticFeedback.mediumImpact();
             },
             child: Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: Icon(
-                state.isPlaying ? Icons.pause : Icons.play_arrow,
-                color: Colors.black, // Black icon like in the image
-                size: 28,
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 6),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: Icon(
+                  state.isPlaying ? Icons.pause : Icons.play_arrow,
+                  color: Colors.white,
+                  size: 32,
+                  key: ValueKey(state.isPlaying),
+                ),
               ),
             ),
           ),
