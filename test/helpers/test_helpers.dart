@@ -10,6 +10,7 @@ import 'package:path/path.dart' as path;
 import 'package:audio_bookshelf_ui/app.dart';
 import 'package:audio_bookshelf_ui/presentation/blocs/audiobook/audiobook_bloc.dart';
 import 'package:audio_bookshelf_ui/presentation/blocs/audio_player/audio_player_bloc.dart';
+import 'package:audio_bookshelf_ui/presentation/blocs/theme/theme_bloc.dart';
 import 'package:audio_bookshelf_ui/application/use_cases/audiobook_use_cases.dart';
 import 'package:audio_bookshelf_ui/domain/entities/audiobook.dart';
 import 'package:audio_bookshelf_ui/domain/entities/user.dart';
