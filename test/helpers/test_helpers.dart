@@ -110,12 +110,6 @@ class TestHelpers {
               body: Center(child: Text('Add Audiobook Page')),
             ),
           ),
-          GoRoute(
-            path: '/audiobook-detail',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Audiobook Detail Page')),
-            ),
-          ),
         ],
       ),
     );

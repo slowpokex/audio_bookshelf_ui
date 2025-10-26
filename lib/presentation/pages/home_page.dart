@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,9 @@ class _HomePageState extends State<HomePage> {
   bool _showFavorites = false;
   String _sortBy = 'created_at';
   String _sortOrder = 'desc';
+  
+  // Debounce timer for search
+  Timer? _searchDebounceTimer;
 
   @override
   void initState() {
@@ -34,15 +38,23 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadAudiobooks();
     });
+    
+    // Listen to search input changes with debouncing
+    _searchController.addListener(() {
+      _debounceSearch();
+    });
   }
 
   @override
   void dispose() {
+    _searchDebounceTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
   void _loadAudiobooks() {
+    if (!mounted) return;
+    
     context.read<AudiobookBloc>().add(
       LoadAudiobooksEvent(
         searchQuery: _searchController.text.isEmpty ? null : _searchController.text,
@@ -56,9 +68,19 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+  
+  void _debounceSearch() {
+    _searchDebounceTimer?.cancel();
+    _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _loadAudiobooks();
+      }
+    });
+  }
 
   void _onSearchChanged(String query) {
-    _loadAudiobooks();
+    // Search is now debounced via the listener
+    // This method is kept for compatibility with search delegate
   }
 
   void _onGenreChanged(String genre) {
@@ -319,7 +341,10 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           onTap: () {
-                            _navigateToAudiobookDetail(audiobook.id);
+                            // Navigate to audio player to start playing
+                            context.read<AudioPlayerBloc>().add(
+                              PlayAudiobookEvent(audiobook),
+                            );
                           },
                         );
                       },
@@ -498,10 +523,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  void _navigateToAudiobookDetail(String audiobookId) {
-    context.go('/audiobook-detail', extra: audiobookId);
   }
 
   void _navigateToAddAudiobook() {
