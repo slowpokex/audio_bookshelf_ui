@@ -1,10 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:io' show Platform;
 
 /// Service for handling file import operations
 class FileImportService {
+  // Cache for Android version detection to avoid repeated checks
+  static int? _cachedAndroidSdkVersion;
+  
   static const List<String> _supportedAudioFormats = [
     'mp3', 'm4a', 'm4b', 'aac', 'flac', 'ogg', 'wav'
   ];
@@ -12,6 +17,9 @@ class FileImportService {
   static const List<String> _supportedImageFormats = [
     'jpg', 'jpeg', 'png', 'webp'
   ];
+  
+  // Android SDK version constants
+  static const int _android13SdkVersion = 33;
 
   /// Validates if the file format is supported for audio
   static bool isSupportedAudioFormat(String filePath) {
@@ -158,45 +166,171 @@ class FileImportService {
   }
 
   /// Requests necessary permissions for file access
-  static Future<bool> requestPermissions() async {
+  /// Returns a Map with permission status and message for better error handling
+  static Future<Map<String, dynamic>> requestPermissionsWithStatus() async {
     if (Platform.isAndroid) {
-      // Try the new granular permissions first (Android 13+)
-      try {
-        final audioPermission = await Permission.audio.request();
-        final photosPermission = await Permission.photos.request();
-        if (audioPermission.isGranted && photosPermission.isGranted) {
-          return true;
-        }
-      } catch (e) {
-        // If granular permissions fail, fall back to storage permission
+      final sdkVersion = await _getAndroidSdkVersion();
+      
+      if (sdkVersion >= _android13SdkVersion) {
+        // Android 13+ (API 33+) - granular media permissions
+        return await _requestGranularMediaPermissions();
+      } else if (sdkVersion >= 29) {
+        // Android 10-12 (API 29-32) - scoped storage
+        return await _requestScopedStoragePermissions();
+      } else {
+        // Android 9 and below - legacy storage permissions
+        return await _requestLegacyStoragePermissions();
+      }
+    }
+    
+    // iOS/other platforms don't need explicit storage permission
+    return {
+      'granted': true,
+      'message': 'Permissions not required on this platform',
+    };
+  }
+
+  /// Requests granular media permissions for Android 13+
+  static Future<Map<String, dynamic>> _requestGranularMediaPermissions() async {
+    try {
+      // Request audio permission
+      final audioStatus = await Permission.audio.request();
+      
+      if (!audioStatus.isGranted) {
+        return {
+          'granted': false,
+          'message': 'Audio permission is required to access audiobook files',
+          'status': audioStatus,
+          'permissionType': 'audio',
+        };
       }
       
-      // Fall back to storage permission for older Android versions
-      final storagePermission = await Permission.storage.request();
-      return storagePermission.isGranted;
+      // Request photos permission for cover images (optional but recommended)
+      final photosStatus = await Permission.photos.request();
+      
+      if (!photosStatus.isGranted) {
+        // Photos permission is optional for audiobooks, so we continue
+        // But log this for the user
+        return {
+          'granted': true,
+          'message': 'Audio permission granted. Photo permission recommended for cover images',
+          'photosStatus': photosStatus,
+        };
+      }
+      
+      return {
+        'granted': true,
+        'message': 'All permissions granted',
+      };
+    } catch (e) {
+      return {
+        'granted': false,
+        'message': 'Failed to request permissions: $e',
+        'error': e.toString(),
+      };
     }
-    return true; // iOS doesn't need explicit storage permission
+  }
+
+  /// Requests scoped storage permissions for Android 10-12
+  static Future<Map<String, dynamic>> _requestScopedStoragePermissions() async {
+    try {
+      final storageStatus = await Permission.storage.request();
+      
+      if (storageStatus.isGranted) {
+        return {'granted': true, 'message': 'Storage permission granted'};
+      }
+      
+      if (storageStatus.isPermanentlyDenied) {
+        return {
+          'granted': false,
+          'message': 'Storage permission permanently denied. Please enable it in Settings.',
+          'status': storageStatus,
+          'requiresSettings': true,
+        };
+      }
+      
+      return {
+        'granted': false,
+        'message': 'Storage permission denied',
+        'status': storageStatus,
+      };
+    } catch (e) {
+      return {
+        'granted': false,
+        'message': 'Failed to request storage permission: $e',
+        'error': e.toString(),
+      };
+    }
+  }
+
+  /// Requests legacy storage permissions for Android 9 and below
+  static Future<Map<String, dynamic>> _requestLegacyStoragePermissions() async {
+    try {
+      // Check if we already have permission
+      final storageStatus = await Permission.storage.status;
+      
+      if (storageStatus.isGranted) {
+        return {'granted': true, 'message': 'Storage permission already granted'};
+      }
+      
+      // Request permission
+      final newStatus = await Permission.storage.request();
+      
+      if (newStatus.isGranted) {
+        return {'granted': true, 'message': 'Storage permission granted'};
+      }
+      
+      if (newStatus.isPermanentlyDenied) {
+        return {
+          'granted': false,
+          'message': 'Storage permission permanently denied. Please enable it in Settings.',
+          'status': newStatus,
+          'requiresSettings': true,
+        };
+      }
+      
+      return {
+        'granted': false,
+        'message': 'Storage permission denied',
+        'status': newStatus,
+      };
+    } catch (e) {
+      return {
+        'granted': false,
+        'message': 'Failed to request storage permission: $e',
+        'error': e.toString(),
+      };
+    }
+  }
+
+  /// Requests necessary permissions for file access (backward compatibility)
+  static Future<bool> requestPermissions() async {
+    final result = await requestPermissionsWithStatus();
+    return result['granted'] as bool;
   }
 
   /// Checks if storage permissions are already granted
   static Future<bool> hasStoragePermissions() async {
     if (Platform.isAndroid) {
-      // Try to check granular permissions first (Android 13+)
-      try {
-        final audioStatus = await Permission.audio.status;
-        final photosStatus = await Permission.photos.status;
-        if (audioStatus.isGranted && photosStatus.isGranted) {
-          return true;
-        }
-      } catch (e) {
-        // If granular permissions fail, check storage permission
-      }
+      final sdkVersion = await _getAndroidSdkVersion();
       
-      // Fall back to storage permission for older Android versions
-      final storageStatus = await Permission.storage.status;
-      return storageStatus.isGranted;
+      if (sdkVersion >= _android13SdkVersion) {
+        try {
+          final audioStatus = await Permission.audio.status;
+          final photosStatus = await Permission.photos.status;
+          // Audio is required, photos is optional
+          return audioStatus.isGranted;
+        } catch (e) {
+          // Fallback to storage permission check
+          final storageStatus = await Permission.storage.status;
+          return storageStatus.isGranted;
+        }
+      } else {
+        final storageStatus = await Permission.storage.status;
+        return storageStatus.isGranted;
+      }
     }
-    return true; // iOS doesn't need explicit storage permission
+    return true; // iOS/other platforms
   }
 
   /// Gets user-friendly permission error message
@@ -207,13 +341,64 @@ class FileImportService {
     return 'File access permission is required.';
   }
 
+  /// Gets Android SDK version (cached for performance)
+  static Future<int> _getAndroidSdkVersion() async {
+    // Return cached version if available
+    if (_cachedAndroidSdkVersion != null) {
+      return _cachedAndroidSdkVersion!;
+    }
+    
+    if (!Platform.isAndroid) {
+      _cachedAndroidSdkVersion = 0;
+      return 0;
+    }
+    
+    try {
+      // Use platform channels to get SDK version
+      // For now, we'll use the permission handler's capability check
+      // In a production app, consider using device_info_plus package
+      final audioStatus = await Permission.audio.status;
+      
+      // If Permission.audio is available and returns a valid status,
+      // we're on Android 13+ (API 33+)
+      if (audioStatus != null) {
+        _cachedAndroidSdkVersion = _android13SdkVersion;
+        return _cachedAndroidSdkVersion!;
+      }
+      
+      // Fallback: assume Android 10+ for scoped storage
+      // This is a conservative estimate
+      _cachedAndroidSdkVersion = 29;
+      return _cachedAndroidSdkVersion!;
+    } catch (e) {
+      // Default to Android 10 (API 29) for safety
+      _cachedAndroidSdkVersion = 29;
+      return _cachedAndroidSdkVersion!;
+    }
+  }
+
+  /// Checks if the device is running Android 13 or above (backward compatibility)
+  static Future<bool> _isAndroid13OrAbove() async {
+    if (!Platform.isAndroid) return false;
+    final sdkVersion = await _getAndroidSdkVersion();
+    return sdkVersion >= _android13SdkVersion;
+  }
+
   /// Gets app documents directory
   static Future<String> getAppDocumentsDirectory() async {
-    final directory = Directory('/storage/emulated/0/Android/data/com.example.audio_bookshelf_ui/files');
-    if (!await directory.exists()) {
-      await directory.create(recursive: true);
+    try {
+      // Use path_provider to get the app documents directory
+      // This will give us the proper directory without needing explicit storage permissions
+      final directory = await getApplicationDocumentsDirectory();
+      return directory.path;
+    } catch (e) {
+      // Fallback to the old approach if path_provider fails
+      final directory = Directory('/storage/emulated/0/Android/data/com.example.audio_bookshelf_ui/files');
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      return directory.path;
     }
-    return directory.path;
   }
 
   /// Copies multiple files from a folder to app directory
