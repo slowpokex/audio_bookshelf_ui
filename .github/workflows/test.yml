@@ -37,9 +37,6 @@ jobs:
     - name: Run widget tests
       run: flutter test test/presentation/ --coverage
       
-    - name: Run integration tests
-      run: flutter test test/integration/ --coverage
-      
     - name: Generate coverage report
       run: |
         flutter test --coverage
