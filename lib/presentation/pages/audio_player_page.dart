@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';
+import 'dart:io';
 import '../../core/services/audio_player_service.dart';
 import '../blocs/audio_player/audio_player_bloc.dart';
 import '../blocs/audio_player/audio_player_event.dart';
@@ -392,8 +393,8 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
                         children: [
                           // Cover image
                           audiobook.hasCoverImage
-                              ? Image.asset(
-                                  audiobook.coverImagePath!,
+                              ? Image.file(
+                                  File(audiobook.coverImagePath!),
                                   fit: BoxFit.cover,
                                   width: 280,
                                   height: 280,

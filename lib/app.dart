@@ -6,12 +6,17 @@ import 'package:http/http.dart' as http;
 
 import 'core/constants/app_constants.dart';
 import 'core/services/audio_player_service.dart';
+import 'core/services/theme_service.dart';
+import 'core/theme/app_theme.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/pages/add_audiobook_page.dart';
 import 'presentation/pages/audio_player_page.dart';
+import 'presentation/pages/settings_page.dart';
 import 'presentation/widgets/loading/splash_screen.dart';
 import 'presentation/blocs/audiobook/audiobook_bloc.dart';
 import 'presentation/blocs/audio_player/audio_player_bloc.dart';
+import 'presentation/blocs/theme/theme_bloc.dart';
+import 'presentation/blocs/theme/theme_bloc_provider.dart';
 import 'application/use_cases/audiobook_use_cases.dart';
 import 'infrastructure/repositories/audiobook_repository_impl.dart';
 import 'infrastructure/data_sources/audiobook_local_data_source.dart';
@@ -43,29 +48,34 @@ class AudioBookshelfApp extends StatelessWidget {
             audioPlayerService: AudioPlayerService(),
           ),
         ),
+        BlocProvider<ThemeBloc>(
+          create: (context) => ThemeBloc(
+            themeService: ThemeService.instance,
+          )..add(const ThemeInitializeEvent()),
+        ),
       ],
-      child: MaterialApp.router(
-        title: AppConstants.appName,
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark),
-          useMaterial3: true,
-        ),
-        themeMode: ThemeMode.system,
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('ru', 'RU'),
-        ],
-        routerConfig: _router,
+      child: ThemeBlocBuilder(
+        builder: (context, themeState) {
+          return MaterialApp.router(
+            title: AppConstants.appName,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeState is ThemeLoadedState 
+                ? themeState.currentMode 
+                : ThemeMode.system,
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', 'US'),
+              Locale('ru', 'RU'),
+            ],
+            routerConfig: _router,
+          );
+        },
       ),
     );
   }
@@ -135,6 +145,11 @@ final GoRouter _router = GoRouter(
       path: '/audio-player',
       name: 'audio-player',
       builder: (context, state) => const AudioPlayerPage(),
+    ),
+    GoRoute(
+      path: '/settings',
+      name: 'settings',
+      builder: (context, state) => const SettingsPage(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

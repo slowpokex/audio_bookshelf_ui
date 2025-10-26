@@ -32,48 +32,17 @@ dependencies:
 
   # Network
   http: ^1.2.2
-  dio: ^5.7.0
 
   # UI Components
   cupertino_icons: ^1.0.8
-  material_design_icons_flutter: ^7.0.7296
 
   # Utilities
   uuid: ^4.5.1
-  intl: ^0.20.2
   path: ^1.9.0
 
   # File Handling
   file_picker: ^10.3.3
   permission_handler: ^12.0.1
-
-  # Image Handling
-  cached_network_image: ^3.4.1
-  image_picker: ^1.1.2
-
-  # Notifications
-  firebase_messaging: ^16.0.3
-  flutter_local_notifications: ^19.5.0
-
-  # Background Tasks
-  workmanager: ^0.9.0+3
-
-  # Biometric Authentication
-  local_auth: ^3.0.0
-
-  # Deep Linking
-
-  # Platform Integration
-  package_info_plus: ^9.0.0
-
-  # Logging
-  logger: ^2.4.0
-
-  # JSON Serialization
-  json_annotation: ^4.9.0
-
-  # Internationalization
-  flutter_gen: ^5.5.0
 
 dev_dependencies:
   # Icon Generation
@@ -81,10 +50,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-
-  # Code Generation
-  build_runner: ^2.7.1
-  json_serializable: ^6.8.0
 
   # Testing
   mockito: ^5.4.4

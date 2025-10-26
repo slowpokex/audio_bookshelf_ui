@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'app.dart';
 import 'core/utils/app_logger.dart';
 import 'core/services/database_service.dart';
+import 'core/services/theme_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,16 @@ void main() async {
       AppLogger.logDatabaseError('force_reinitialize', 'database_service', reinitError.toString(), StackTrace.current);
       AppLogger.logAppLifecycle('Database re-initialization also failed', data: {'error': reinitError.toString()});
     }
+  }
+  
+  // Initialize theme service
+  AppLogger.logAppLifecycle('Starting theme service initialization');
+  try {
+    await ThemeService.instance.initialize();
+    AppLogger.logAppLifecycle('Theme service initialization completed successfully');
+  } catch (e) {
+    AppLogger.logError('Failed to initialize theme service', StackTrace.current);
+    AppLogger.logAppLifecycle('Theme service initialization failed', data: {'error': e.toString()});
   }
   
   // Set system UI overlay style
