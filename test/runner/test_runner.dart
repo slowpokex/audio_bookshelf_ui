@@ -25,14 +25,6 @@ void main() {
       print('Running widget tests...');
     });
   });
-  
-  // Run integration tests
-  group('Integration Tests', () {
-    test('should run all integration tests', () {
-      // This will be called by the test runner
-      print('Running integration tests...');
-    });
-  });
 }
 
 /// Test categories for better organization

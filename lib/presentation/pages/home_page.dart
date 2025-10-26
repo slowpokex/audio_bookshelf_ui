@@ -373,81 +373,83 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Sort Audiobooks'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: const Text('Title'),
-              value: 'title',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Author'),
-              value: 'author',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Rating'),
-              value: 'rating',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Duration'),
-              value: 'duration',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Date Added'),
-              value: 'created_at',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-            ),
-            const Divider(),
-            RadioListTile<String>(
-              title: const Text('Ascending'),
-              value: 'asc',
-              groupValue: _sortOrder,
-              onChanged: (value) {
-                setState(() {
-                  _sortOrder = value!;
-                });
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Descending'),
-              value: 'desc',
-              groupValue: _sortOrder,
-              onChanged: (value) {
-                setState(() {
-                  _sortOrder = value!;
-                });
-              },
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text('Title'),
+                value: 'title',
+                groupValue: _sortBy,
+                onChanged: (value) {
+                  setState(() {
+                    _sortBy = value!;
+                  });
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Author'),
+                value: 'author',
+                groupValue: _sortBy,
+                onChanged: (value) {
+                  setState(() {
+                    _sortBy = value!;
+                  });
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Rating'),
+                value: 'rating',
+                groupValue: _sortBy,
+                onChanged: (value) {
+                  setState(() {
+                    _sortBy = value!;
+                  });
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Duration'),
+                value: 'duration',
+                groupValue: _sortBy,
+                onChanged: (value) {
+                  setState(() {
+                    _sortBy = value!;
+                  });
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Date Added'),
+                value: 'created_at',
+                groupValue: _sortBy,
+                onChanged: (value) {
+                  setState(() {
+                    _sortBy = value!;
+                  });
+                },
+              ),
+              const Divider(),
+              RadioListTile<String>(
+                title: const Text('Ascending'),
+                value: 'asc',
+                groupValue: _sortOrder,
+                onChanged: (value) {
+                  setState(() {
+                    _sortOrder = value!;
+                  });
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Descending'),
+                value: 'desc',
+                groupValue: _sortOrder,
+                onChanged: (value) {
+                  setState(() {
+                    _sortOrder = value!;
+                  });
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
