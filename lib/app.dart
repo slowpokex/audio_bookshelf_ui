@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import 'core/constants/app_constants.dart';
 import 'presentation/pages/home_page.dart';
+import 'presentation/pages/add_audiobook_page.dart';
 import 'presentation/widgets/loading/splash_screen.dart';
 import 'presentation/blocs/audiobook/audiobook_bloc.dart';
 import 'application/use_cases/audiobook_use_cases.dart';
@@ -120,38 +121,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/add-audiobook',
       name: 'add-audiobook',
-      builder: (context, state) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Add Audiobook'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.add_circle_outline,
-                size: 64,
-                color: Colors.blue,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Add Audiobook',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Add audiobook page coming soon...',
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () => context.go('/'),
-                child: const Text('Go Home'),
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (context, state) => const AddAudiobookPage(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

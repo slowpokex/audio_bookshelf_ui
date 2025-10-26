@@ -65,7 +65,6 @@ dependencies:
   # Deep Linking
 
   # Platform Integration
-  device_info_plus: ^12.2.0
   package_info_plus: ^9.0.0
 
   # Logging
