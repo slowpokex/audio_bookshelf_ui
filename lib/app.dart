@@ -23,36 +23,78 @@ import 'infrastructure/data_sources/audiobook_local_data_source.dart';
 import 'infrastructure/data_sources/audiobook_remote_data_source.dart';
 
 /// Main application widget
-class AudioBookshelfApp extends StatelessWidget {
+class AudioBookshelfApp extends StatefulWidget {
   const AudioBookshelfApp({super.key});
+
+  @override
+  State<AudioBookshelfApp> createState() => _AudioBookshelfAppState();
+}
+
+class _AudioBookshelfAppState extends State<AudioBookshelfApp> {
+  late final http.Client _httpClient;
+  late final AudiobookRepositoryImpl _audiobookRepository;
+  late final AudioPlayerBloc _audioPlayerBloc;
+  late final AudiobookBloc _audiobookBloc;
+  late final ThemeBloc _themeBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    // Create HTTP client that will be disposed properly
+    _httpClient = http.Client();
+    
+    // Create repository with proper lifecycle management
+    _audiobookRepository = AudiobookRepositoryImpl(
+      localDataSource: AudiobookLocalDataSource(),
+      remoteDataSource: AudiobookRemoteDataSource(
+        client: _httpClient,
+        baseUrl: AppConstants.apiBaseUrl,
+        apiKey: AppConstants.apiKey,
+      ),
+    );
+    
+    // Create blocs that persist across rebuilds
+    _audiobookBloc = AudiobookBloc(
+      getAudiobooksUseCase: GetAudiobooksUseCase(_audiobookRepository),
+      getAudiobookUseCase: GetAudiobookUseCase(_audiobookRepository),
+      createAudiobookUseCase: CreateAudiobookUseCase(_audiobookRepository),
+      updateAudiobookUseCase: UpdateAudiobookUseCase(_audiobookRepository),
+      deleteAudiobookUseCase: DeleteAudiobookUseCase(_audiobookRepository),
+      toggleFavoriteUseCase: ToggleFavoriteUseCase(_audiobookRepository),
+      rateAudiobookUseCase: RateAudiobookUseCase(_audiobookRepository),
+      searchAudiobooksUseCase: SearchAudiobooksUseCase(_audiobookRepository),
+      getRecommendationsUseCase: GetRecommendationsUseCase(_audiobookRepository),
+    );
+    
+    _audioPlayerBloc = AudioPlayerBloc(
+      audioPlayerService: AudioPlayerService(),
+    );
+    
+    _themeBloc = ThemeBloc(
+      themeService: ThemeService.instance,
+    )..add(const ThemeInitializeEvent());
+  }
+
+  @override
+  void dispose() {
+    // Dispose blocs in reverse order of creation
+    _themeBloc.close();
+    _audioPlayerBloc.close();
+    _audiobookBloc.close();
+    
+    // Dispose HTTP client to prevent memory leaks
+    _httpClient.close();
+    
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<AudiobookBloc>(
-          create: (context) => AudiobookBloc(
-            getAudiobooksUseCase: GetAudiobooksUseCase(_audiobookRepository),
-            getAudiobookUseCase: GetAudiobookUseCase(_audiobookRepository),
-            createAudiobookUseCase: CreateAudiobookUseCase(_audiobookRepository),
-            updateAudiobookUseCase: UpdateAudiobookUseCase(_audiobookRepository),
-            deleteAudiobookUseCase: DeleteAudiobookUseCase(_audiobookRepository),
-            toggleFavoriteUseCase: ToggleFavoriteUseCase(_audiobookRepository),
-            rateAudiobookUseCase: RateAudiobookUseCase(_audiobookRepository),
-            searchAudiobooksUseCase: SearchAudiobooksUseCase(_audiobookRepository),
-            getRecommendationsUseCase: GetRecommendationsUseCase(_audiobookRepository),
-          ),
-        ),
-        BlocProvider<AudioPlayerBloc>(
-          create: (context) => AudioPlayerBloc(
-            audioPlayerService: AudioPlayerService(),
-          ),
-        ),
-        BlocProvider<ThemeBloc>(
-          create: (context) => ThemeBloc(
-            themeService: ThemeService.instance,
-          )..add(const ThemeInitializeEvent()),
-        ),
+        BlocProvider<AudiobookBloc>.value(value: _audiobookBloc),
+        BlocProvider<AudioPlayerBloc>.value(value: _audioPlayerBloc),
+        BlocProvider<ThemeBloc>.value(value: _themeBloc),
       ],
       child: ThemeBlocBuilder(
         builder: (context, themeState) {
@@ -64,7 +106,7 @@ class AudioBookshelfApp extends StatelessWidget {
             themeMode: themeState is ThemeLoadedState 
                 ? themeState.currentMode 
                 : ThemeMode.system,
-            localizationsDelegates: [
+            localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
@@ -82,7 +124,7 @@ class AudioBookshelfApp extends StatelessWidget {
 }
 
 /// Router configuration
-final GoRouter _router = GoRouter(
+final _router = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(
@@ -94,47 +136,6 @@ final GoRouter _router = GoRouter(
       path: '/',
       name: 'home',
       builder: (context, state) => const HomePage(),
-    ),
-    GoRoute(
-      path: '/audiobook-detail',
-      name: 'audiobook-detail',
-      builder: (context, state) {
-        final audiobookId = state.extra as String?;
-        if (audiobookId == null) {
-          return const Scaffold(
-            body: Center(
-              child: Text('Audiobook ID is required'),
-            ),
-          );
-        }
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Audiobook Detail'),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.audiotrack,
-                  size: 64,
-                  color: Colors.blue,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Audiobook ID: $audiobookId',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Audiobook detail page coming soon...',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     ),
     GoRoute(
       path: '/add-audiobook',
@@ -178,15 +179,5 @@ final GoRouter _router = GoRouter(
         ],
       ),
     ),
-  ),
-);
-
-/// Repository instance (this would be injected via dependency injection)
-final _audiobookRepository = AudiobookRepositoryImpl(
-  localDataSource: AudiobookLocalDataSource(),
-  remoteDataSource: AudiobookRemoteDataSource(
-    client: http.Client(),
-    baseUrl: AppConstants.apiBaseUrl,
-    apiKey: AppConstants.apiKey,
   ),
 );
