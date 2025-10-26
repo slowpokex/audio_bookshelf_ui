@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../blocs/audiobook/audiobook_bloc.dart';
 import '../blocs/audio_player/audio_player_bloc.dart';
 import '../blocs/audio_player/audio_player_event.dart';
+import '../blocs/theme/theme_bloc.dart';
 import '../widgets/loading/simple_loading_widget.dart';
 import '../widgets/common/app_icon.dart';
 import '../widgets/audio_player/audio_player_mini.dart';
@@ -151,6 +152,35 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.sort),
             onPressed: () {
               _showSortDialog();
+            },
+          ),
+          // Theme toggle button
+          BlocBuilder<ThemeBloc, ThemeState>(
+            builder: (context, state) {
+              if (state is ThemeLoadedState) {
+                return IconButton(
+                  icon: Icon(
+                    state.currentMode == ThemeMode.dark 
+                        ? Icons.light_mode 
+                        : state.currentMode == ThemeMode.light 
+                            ? Icons.dark_mode 
+                            : Icons.brightness_auto,
+                  ),
+                  tooltip: 'Toggle theme',
+                  onPressed: () {
+                    context.read<ThemeBloc>().add(const ThemeToggleEvent());
+                  },
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          // Theme settings button
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
+            onPressed: () {
+              context.go('/settings');
             },
           ),
         ],

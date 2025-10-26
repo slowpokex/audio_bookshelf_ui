@@ -119,33 +119,20 @@ class AudioPlayerInfo extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         
-        // Progress info - Always show progress bar
+        // Progress info - Show time without percentage
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Text(
-                  state.formattedCurrentPosition,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                Text(
-                  ' / ',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                Text(
-                  state.formattedTotalDuration,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-            // Progress percentage
             Text(
-              '${(state.progressPercentage * 100).toStringAsFixed(0)}%',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              state.formattedCurrentPosition,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            Text(
+              ' / ',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            Text(
+              state.formattedTotalDuration,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),
