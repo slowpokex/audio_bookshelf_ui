@@ -50,6 +50,27 @@ class MockAudioPlayerBloc extends Mock implements AudioPlayerBloc {
   Future<void> close() async {}
 }
 
+class MockThemeBloc extends Mock implements ThemeBloc {
+  @override
+  Stream<ThemeState> get stream => Stream.value(const ThemeLoadedState(
+        currentMode: ThemeMode.system,
+        isDark: false,
+        isLight: false,
+        isSystem: true,
+      ));
+
+  @override
+  ThemeState get state => const ThemeLoadedState(
+        currentMode: ThemeMode.system,
+        isDark: false,
+        isLight: false,
+        isSystem: true,
+      );
+
+  @override
+  Future<void> close() async {}
+}
+
 // Mock classes for Use Cases
 class MockGetAudiobooksUseCase extends Mock implements GetAudiobooksUseCase {}
 class MockGetAudiobookUseCase extends Mock implements GetAudiobookUseCase {}
@@ -92,6 +113,9 @@ class TestHelpers {
         BlocProvider<AudioPlayerBloc>(
           create: (context) => audioPlayerBloc,
         ),
+      BlocProvider<ThemeBloc>(
+        create: (context) => MockThemeBloc(),
+      ),
       ...?additionalProviders,
     ];
     
@@ -147,6 +171,9 @@ class TestHelpers {
       ),
       BlocProvider<AudioPlayerBloc>(
         create: (context) => MockAudioPlayerBloc(),
+      ),
+      BlocProvider<ThemeBloc>(
+        create: (context) => MockThemeBloc(),
       ),
       ...?blocProviders?.values,
     ];
