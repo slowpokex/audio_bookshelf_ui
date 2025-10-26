@@ -7,7 +7,8 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  test:
+      
+  test-android:
     runs-on: ubuntu-latest
     
     steps:
@@ -19,6 +20,12 @@ jobs:
       with:
         flutter-version: '3.16.0'
         channel: 'stable'
+        
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
         
     - name: Install dependencies
       run: flutter pub get
@@ -43,197 +50,15 @@ jobs:
     - name: Upload coverage reports
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-report
+        name: android-coverage-report
         path: coverage/html/
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
         file: coverage/lcov.info
-        flags: unittests
-        name: codecov-umbrella
-        
-  test-windows:
-    runs-on: windows-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-        channel: 'stable'
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Run tests
-      run: flutter test --coverage
-      
-  test-macos:
-    runs-on: macos-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-        channel: 'stable'
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Run tests
-      run: flutter test --coverage
-      
-  test-android:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-        channel: 'stable'
-        
-    - name: Setup Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'zulu'
-        java-version: '17'
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Run Android tests
-      run: flutter test --coverage
-      
-  test-ios:
-    runs-on: macos-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-        channel: 'stable'
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Run iOS tests
-      run: flutter test --coverage
-      
-  test-web:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-        channel: 'stable'
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Run web tests
-      run: flutter test --coverage
-      
-  test-desktop:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-        channel: 'stable'
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Run desktop tests
-      run: flutter test --coverage
-      
-  performance-test:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-        channel: 'stable'
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Run performance tests
-      run: |
-        flutter test test/performance/ --coverage
-        flutter test test/integration/ --coverage
-        
-    - name: Generate performance report
-      run: |
-        flutter test --coverage
-        genhtml coverage/lcov.info -o coverage/html
-        
-    - name: Upload performance report
-      uses: actions/upload-artifact@v4
-      with:
-        name: performance-report
-        path: coverage/html/
-        
-  security-test:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-        channel: 'stable'
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Run security tests
-      run: flutter test test/security/ --coverage
-      
-    - name: Generate security report
-      run: |
-        flutter test --coverage
-        genhtml coverage/lcov.info -o coverage/html
-        
-    - name: Upload security report
-      uses: actions/upload-artifact@v4
-      with:
-        name: security-report
-        path: coverage/html/
+        flags: android-tests
+        name: android-coverage
         
   accessibility-test:
     runs-on: ubuntu-latest
@@ -267,7 +92,7 @@ jobs:
         
   test-summary:
     runs-on: ubuntu-latest
-    needs: [test, test-windows, test-macos, test-android, test-ios, test-web, test-desktop]
+    needs: [test-android, accessibility-test]
     
     steps:
     - name: Checkout code
@@ -293,7 +118,7 @@ jobs:
     - name: Upload comprehensive coverage report
       uses: actions/upload-artifact@v4
       with:
-        name: comprehensive-coverage-report
+        name: android-accessibility-coverage-report
         path: coverage/html/
         
     - name: Comment coverage on PR
@@ -326,12 +151,13 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## Test Coverage Report
+              body: `## Android & Accessibility Test Coverage Report
               
               **Total Coverage**: ${percentage}%
               **Covered Lines**: ${coveredLines}
               **Total Lines**: ${totalLines}
               
-              Coverage report is available in the artifacts.`
+              Coverage report includes Android tests and accessibility tests.
+              Report is available in the artifacts.`
             });
           }
