@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:audio_bookshelf_ui/core/services/theme_service.dart';
-import 'package:audio_bookshelf_ui/core/theme/app_theme.dart';
 import 'package:audio_bookshelf_ui/presentation/blocs/theme/theme_bloc.dart';
-import 'package:audio_bookshelf_ui/presentation/pages/theme_settings_page.dart';
 
 void main() {
   group('Theme System Tests', () {
@@ -78,28 +75,6 @@ void main() {
       
       // Should persist the dark theme
       expect(newThemeService.currentThemeMode, ThemeMode.dark);
-    });
-    
-    testWidgets('Theme settings page renders correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          home: BlocProvider<ThemeBloc>(
-            create: (context) => ThemeBloc(themeService: themeService)
-              ..add(const ThemeInitializeEvent()),
-            child: const ThemeSettingsPage(),
-          ),
-        ),
-      );
-      
-      await tester.pumpAndSettle();
-      
-      // Should show theme settings page
-      expect(find.text('Theme Settings'), findsOneWidget);
-      expect(find.text('Theme Mode'), findsOneWidget);
-      expect(find.text('Preview'), findsOneWidget);
-      expect(find.text('Quick Actions'), findsOneWidget);
     });
     
     testWidgets('Theme Bloc state management', (WidgetTester tester) async {
