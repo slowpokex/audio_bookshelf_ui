@@ -23,7 +23,7 @@ class ProgressTrackingService {
   /// Start tracking progress for an audiobook
   void startTracking(String audiobookId, Duration totalDuration) {
     if (_currentUserId == null) {
-      AppLogger.logError('ProgressTrackingService not initialized');
+      AppLogger.logError('ProgressTrackingService not initialized', StackTrace.current);
       return;
     }
 
@@ -85,7 +85,7 @@ class ProgressTrackingService {
       
       _lastSavedPosition = currentPosition;
     } catch (e) {
-      AppLogger.logError('Failed to save progress', error: e);
+      AppLogger.logError('Failed to save progress', StackTrace.current, context: {'error': e.toString()});
     }
   }
 

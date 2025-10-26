@@ -74,6 +74,16 @@ class SkipBackwardEvent extends AudioPlayerEvent {
   List<Object?> get props => [duration];
 }
 
+/// Event to skip forward 10 seconds
+class SkipForward10Event extends AudioPlayerEvent {
+  const SkipForward10Event();
+}
+
+/// Event to skip backward 10 seconds
+class SkipBackward10Event extends AudioPlayerEvent {
+  const SkipBackward10Event();
+}
+
 /// Event to toggle play/pause
 class TogglePlayPauseEvent extends AudioPlayerEvent {
   const TogglePlayPauseEvent();

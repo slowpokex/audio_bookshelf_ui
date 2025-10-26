@@ -35,6 +35,8 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     on<SetPlaybackSpeedEvent>(_onSetPlaybackSpeed);
     on<SkipForwardEvent>(_onSkipForward);
     on<SkipBackwardEvent>(_onSkipBackward);
+    on<SkipForward10Event>(_onSkipForward10);
+    on<SkipBackward10Event>(_onSkipBackward10);
     on<TogglePlayPauseEvent>(_onTogglePlayPause);
     on<UpdatePositionEvent>(_onUpdatePosition);
     on<UpdateDurationEvent>(_onUpdateDuration);
@@ -325,6 +327,34 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       AppLogger.logDebug('Skipped backward by: ${event.duration.inSeconds}s');
     } catch (e) {
       AppLogger.logError('Failed to skip backward', StackTrace.current, context: {'error': e.toString()});
+      emit(state.copyWith(error: 'Failed to skip backward: ${e.toString()}'));
+    }
+  }
+
+  /// Skip forward 10 seconds
+  Future<void> _onSkipForward10(
+    SkipForward10Event event,
+    Emitter<AudioPlayerState> emit,
+  ) async {
+    try {
+      await _audioPlayerService.skipForward(duration: const Duration(seconds: 10));
+      AppLogger.logDebug('Skipped forward by 10 seconds');
+    } catch (e) {
+      AppLogger.logError('Failed to skip forward 10 seconds', StackTrace.current, context: {'error': e.toString()});
+      emit(state.copyWith(error: 'Failed to skip forward: ${e.toString()}'));
+    }
+  }
+
+  /// Skip backward 10 seconds
+  Future<void> _onSkipBackward10(
+    SkipBackward10Event event,
+    Emitter<AudioPlayerState> emit,
+  ) async {
+    try {
+      await _audioPlayerService.skipBackward(duration: const Duration(seconds: 10));
+      AppLogger.logDebug('Skipped backward by 10 seconds');
+    } catch (e) {
+      AppLogger.logError('Failed to skip backward 10 seconds', StackTrace.current, context: {'error': e.toString()});
       emit(state.copyWith(error: 'Failed to skip backward: ${e.toString()}'));
     }
   }

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../presentation/blocs/audio_player/audio_player_bloc.dart';
 import '../../../presentation/blocs/audio_player/audio_player_event.dart';
 import '../../../presentation/blocs/audio_player/audio_player_state.dart';
+import '../../../presentation/pages/expanded_audio_player_page.dart';
 
 /// Audio player info widget showing current audiobook details
 class AudioPlayerInfo extends StatelessWidget {
@@ -35,6 +36,9 @@ class AudioPlayerInfo extends StatelessWidget {
               
               // Play button
               _buildPlayButton(context, state),
+              
+              // Expand button
+              _buildExpandButton(context),
             ],
           ),
         );
@@ -203,8 +207,28 @@ class AudioPlayerInfo extends StatelessWidget {
     );
   }
 
+  /// Build expand button
+  Widget _buildExpandButton(BuildContext context) {
+    return IconButton(
+      onPressed: () => _navigateToExpandedPlayer(context),
+      icon: const Icon(Icons.expand_more),
+      iconSize: 24,
+      tooltip: 'Expand Player',
+    );
+  }
+
   /// Navigate to full player
   void _navigateToFullPlayer(BuildContext context) {
     context.go('/audio-player');
+  }
+
+  /// Navigate to expanded player
+  void _navigateToExpandedPlayer(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ExpandedAudioPlayerPage(),
+        fullscreenDialog: true,
+      ),
+    );
   }
 }

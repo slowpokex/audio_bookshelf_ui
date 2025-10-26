@@ -10,7 +10,6 @@ import 'presentation/pages/home_page.dart';
 import 'presentation/pages/add_audiobook_page.dart';
 import 'presentation/pages/audio_player_page.dart';
 import 'presentation/widgets/loading/splash_screen.dart';
-import 'presentation/widgets/audio_player/audio_player_mini.dart';
 import 'presentation/blocs/audiobook/audiobook_bloc.dart';
 import 'presentation/blocs/audio_player/audio_player_bloc.dart';
 import 'application/use_cases/audiobook_use_cases.dart';

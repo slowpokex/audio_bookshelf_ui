@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import '../utils/app_logger.dart';
 import '../../presentation/blocs/audio_player/audio_player_bloc.dart';
 import '../../presentation/blocs/audio_player/audio_player_event.dart';
@@ -24,7 +23,7 @@ class SleepTimerService {
   /// Start sleep timer
   void startTimer(Duration duration) {
     if (_audioPlayerBloc == null) {
-      AppLogger.logError('SleepTimerService not initialized');
+      AppLogger.logError('SleepTimerService not initialized', StackTrace.current);
       return;
     }
 
