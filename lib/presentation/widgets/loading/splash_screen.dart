@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'loading_screen.dart';
 
-/// Splash screen that shows the loading animation and then navigates to home
+/// Splash screen that shows a loading animation and then navigates to home
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -11,33 +10,51 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  bool _isLoading = true;
+  @override
+  void initState() {
+    super.initState();
+    
+    // Navigate to home page after splash duration
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        final navigator = GoRouter.of(context);
+        navigator.go('/');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return LoadingScreen(
-        loadingDuration: const Duration(seconds: 4),
-        onLoadingComplete: () {
-          setState(() {
-            _isLoading = false;
-          });
-          
-          // Navigate to home page after a brief delay
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              final navigator = GoRouter.of(context);
-              navigator.go('/');
-            }
-          });
-        },
-      );
-    }
-    
-    // This should not be reached, but just in case
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: Center(
-        child: CircularProgressIndicator(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // App icon/logo
+            Icon(
+              Icons.audiotrack,
+              size: 80,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+            const SizedBox(height: 24),
+            // App name
+            Text(
+              'Audio Bookshelf',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 48),
+            // Loading indicator
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

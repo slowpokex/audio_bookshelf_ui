@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -301,9 +302,7 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final audiobook = state.audiobooks[index];
                         return ListTile(
-                          leading: CircleAvatar(
-                            child: Text(audiobook.title[0].toUpperCase()),
-                          ),
+                          leading: _buildAudiobookCover(audiobook),
                           title: Text(audiobook.title),
                           subtitle: Text(audiobook.author),
                           trailing: Row(
@@ -527,6 +526,62 @@ class _HomePageState extends State<HomePage> {
 
   void _navigateToAddAudiobook() {
     context.go('/add-audiobook');
+  }
+
+  /// Build audiobook cover image widget
+  Widget _buildAudiobookCover(audiobook) {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: audiobook.hasCoverImage
+            ? Image.file(
+                File(audiobook.coverImagePath!),
+                fit: BoxFit.cover,
+                width: 56,
+                height: 56,
+                errorBuilder: (context, error, stackTrace) {
+                  return _buildDefaultCover();
+                },
+                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                  if (wasSynchronouslyLoaded) return child;
+                  return AnimatedOpacity(
+                    opacity: frame == null ? 0 : 1,
+                    duration: const Duration(milliseconds: 200),
+                    child: child,
+                  );
+                },
+              )
+            : _buildDefaultCover(),
+      ),
+    );
+  }
+
+  /// Build default cover when no image is available
+  Widget _buildDefaultCover() {
+    return Container(
+      color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+      child: Icon(
+        Icons.library_books,
+        color: Theme.of(context).colorScheme.onPrimaryContainer,
+        size: 28,
+      ),
+    );
   }
 }
 

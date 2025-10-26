@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import '../loading/animated_books_logo.dart';
-import '../loading/simple_animated_logo.dart';
 
 /// App icon widget that can be used in various places
 class AppIcon extends StatelessWidget {
@@ -18,17 +15,11 @@ class AppIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Platform.isAndroid || Platform.isIOS
-        ? SimpleAnimatedLogo(
-            size: size,
-            showAnimation: showAnimation,
-            color: color,
-          )
-        : AnimatedBooksLogo(
-            size: size,
-            showAnimation: showAnimation,
-            color: color,
-          );
+    return Icon(
+      Icons.audiotrack,
+      size: size,
+      color: color ?? Theme.of(context).colorScheme.primary,
+    );
   }
 }
 
