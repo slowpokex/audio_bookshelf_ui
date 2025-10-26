@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:ui';
 import '../../core/services/audio_player_service.dart';
 import '../blocs/audio_player/audio_player_bloc.dart';
 import '../blocs/audio_player/audio_player_event.dart';
@@ -28,22 +29,95 @@ class _AudioPlayerView extends StatefulWidget {
   State<_AudioPlayerView> createState() => _AudioPlayerViewState();
 }
 
-class _AudioPlayerViewState extends State<_AudioPlayerView> {
+class _AudioPlayerViewState extends State<_AudioPlayerView>
+    with TickerProviderStateMixin {
   late FocusNode _focusNode;
   double _seekStartX = 0.0;
   Duration _seekStartPosition = Duration.zero;
   bool _isSeeking = false;
+  
+  // Animation controllers
+  late AnimationController _coverAnimationController;
+  late AnimationController _controlsAnimationController;
+  late AnimationController _progressAnimationController;
+  
+  // Animations
+  late Animation<double> _coverScaleAnimation;
+  late Animation<double> _controlsOpacityAnimation;
+  late Animation<double> _progressOpacityAnimation;
+  late Animation<Offset> _controlsSlideAnimation;
 
   @override
   void initState() {
     super.initState();
     _focusNode = FocusNode();
     _focusNode.requestFocus();
+    
+    // Initialize animation controllers
+    _coverAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _controlsAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _progressAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    
+    // Initialize animations
+    _coverScaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _coverAnimationController,
+      curve: Curves.elasticOut,
+    ));
+    
+    _controlsOpacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controlsAnimationController,
+      curve: Curves.easeOut,
+    ));
+    
+    _progressOpacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _progressAnimationController,
+      curve: Curves.easeOut,
+    ));
+    
+    _controlsSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controlsAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+    
+    // Start animations
+    _coverAnimationController.forward();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      _controlsAnimationController.forward();
+    });
+    Future.delayed(const Duration(milliseconds: 400), () {
+      _progressAnimationController.forward();
+    });
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _coverAnimationController.dispose();
+    _controlsAnimationController.dispose();
+    _progressAnimationController.dispose();
     super.dispose();
   }
 
@@ -54,27 +128,76 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
-          title: const Text('Now Playing'),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
           actions: [
             IconButton(
               onPressed: () {
                 _showKeyboardShortcutsDialog(context);
               },
-              icon: const Icon(Icons.help_outline),
-              tooltip: 'Keyboard Shortcuts',
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.help_outline,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ),
             IconButton(
               onPressed: () {
                 // Add to favorites or other actions
               },
-              icon: const Icon(Icons.favorite_border),
-              tooltip: 'Add to Favorites',
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.favorite_border,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ),
             PopupMenuButton<String>(
               onSelected: (value) {
                 // Handle menu selection
               },
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.more_vert,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'bookmark',
@@ -107,20 +230,34 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
               return _buildNoContent(context);
             }
 
-            return Column(
-              children: [
-                // Cover image and info
-                Expanded(
-                  flex: 3,
-                  child: _buildCoverSection(context, state),
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    Theme.of(context).colorScheme.surface,
+                    Theme.of(context).colorScheme.surface,
+                  ],
+                  stops: const [0.0, 0.3, 1.0],
                 ),
-                
-                // Controls
-                Expanded(
-                  flex: 2,
-                  child: _buildControlsSection(context, state),
-                ),
-              ],
+              ),
+              child: Column(
+                children: [
+                  // Cover image and info
+                  Expanded(
+                    flex: 3,
+                    child: _buildCoverSection(context, state),
+                  ),
+                  
+                  // Controls with glassmorphism effect
+                  Expanded(
+                    flex: 2,
+                    child: _buildControlsSection(context, state),
+                  ),
+                ],
+              ),
             );
           },
         ),
@@ -166,13 +303,16 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
       onTap: () {
         // Single tap to toggle play/pause
         context.read<AudioPlayerBloc>().add(const TogglePlayPauseEvent());
+        HapticFeedback.lightImpact();
       },
       onDoubleTap: () {
         // Double tap to skip forward
         context.read<AudioPlayerBloc>().add(const SkipForwardEvent());
+        HapticFeedback.mediumImpact();
       },
       onLongPress: () {
         // Long press to show options
+        HapticFeedback.heavyImpact();
         _showPlayerOptionsDialog(context);
       },
       onPanStart: (details) {
@@ -194,91 +334,164 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Seek indicator
-            if (_isSeeking)
-              Container(
+            // Seek indicator with animation
+            AnimatedOpacity(
+              opacity: _isSeeking ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.9),
+                  color: Colors.black.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Text(
                   'Seeking...',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
+            ),
             if (_isSeeking) const SizedBox(height: 16),
-            // Cover image
-            Container(
-              width: 280,
-              height: 280,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+            
+            // Cover image with enhanced animations
+            AnimatedBuilder(
+              animation: _coverScaleAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _coverScaleAnimation.value,
+                  child: Container(
+                    width: 280,
+                    height: 280,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 30,
+                          offset: const Offset(0, 15),
+                        ),
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                          blurRadius: 40,
+                          offset: const Offset(0, 20),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: [
+                          // Cover image
+                          audiobook.hasCoverImage
+                              ? Image.asset(
+                                  audiobook.coverImagePath!,
+                                  fit: BoxFit.cover,
+                                  width: 280,
+                                  height: 280,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return _buildDefaultCover(context);
+                                  },
+                                )
+                              : _buildDefaultCover(context),
+                          
+                          // Play/Pause overlay with blur effect
+                          if (state.isPlaying)
+                            Positioned.fill(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                                  child: Container(
+                                    color: Colors.black.withOpacity(0.1),
+                                    child: Center(
+                                      child: Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.3),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.pause,
+                                          color: Colors.white,
+                                          size: 32,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: audiobook.hasCoverImage
-                    ? Image.asset(
-                        audiobook.coverImagePath!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildDefaultCover(context);
-                        },
-                      )
-                    : _buildDefaultCover(context),
-              ),
+                );
+              },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             
-            // Audiobook info
-            Text(
-              audiobook.title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            
-            Text(
-              audiobook.displayAuthor,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            
-            if (audiobook.genre != null) ...[
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+            // Audiobook info with fade-in animation
+            FadeTransition(
+              opacity: _controlsOpacityAnimation,
+              child: SlideTransition(
+                position: _controlsSlideAnimation,
+                child: Column(
+                  children: [
+                    Text(
+                      audiobook.title,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    
+                    Text(
+                      audiobook.displayAuthor,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    if (audiobook.genre != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Text(
+                          audiobook.genre!,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                child: Text(
-                  audiobook.genre!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
               ),
-            ],
+            ),
           ],
         ),
       ),
@@ -346,21 +559,56 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
 
   /// Build controls section
   Widget _buildControlsSection(BuildContext context, AudioPlayerState state) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          // Progress bar
-          _buildProgressSection(context, state),
-          const SizedBox(height: 24),
-          
-          // Main controls
-          _buildMainControls(context, state),
-          const SizedBox(height: 24),
-          
-          // Secondary controls
-          _buildSecondaryControls(context, state),
-        ],
+    return FadeTransition(
+      opacity: _controlsOpacityAnimation,
+      child: SlideTransition(
+        position: _controlsSlideAnimation,
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Progress bar with enhanced design
+                    FadeTransition(
+                      opacity: _progressOpacityAnimation,
+                      child: _buildProgressSection(context, state),
+                    ),
+                    const SizedBox(height: 32),
+                    
+                    // Main controls with better spacing
+                    _buildMainControls(context, state),
+                    const SizedBox(height: 24),
+                    
+                    // Secondary controls
+                    _buildSecondaryControls(context, state),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -369,31 +617,52 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
   Widget _buildProgressSection(BuildContext context, AudioPlayerState state) {
     return Column(
       children: [
-        // Time display
+        // Time display with better styling
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              state.formattedCurrentPosition,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                state.formattedCurrentPosition,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
-            Text(
-              state.formattedTotalDuration,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                state.formattedRemainingTime,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         
-        // Progress slider
+        // Enhanced progress slider
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
-            trackHeight: 6,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 14),
+            trackHeight: 8,
+            activeTrackColor: Theme.of(context).colorScheme.primary,
+            inactiveTrackColor: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            thumbColor: Colors.white,
+            overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
           ),
           child: Slider(
             value: state.progressPercentage,
@@ -402,10 +671,95 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
                 milliseconds: (value * state.totalDuration.inMilliseconds).round(),
               );
               context.read<AudioPlayerBloc>().add(SeekEvent(position));
+              HapticFeedback.lightImpact();
             },
           ),
         ),
+        const SizedBox(height: 16),
+        
+        // Quick seek buttons with modern design
+        _buildQuickSeekButtons(context, state),
       ],
+    );
+  }
+
+  /// Build quick seek buttons
+  Widget _buildQuickSeekButtons(BuildContext context, AudioPlayerState state) {
+    if (state.totalDuration.inMilliseconds == 0) return const SizedBox.shrink();
+    
+    final seekOptions = [
+      {'label': '10s', 'duration': const Duration(seconds: 10), 'icon': Icons.replay_10},
+      {'label': '30s', 'duration': const Duration(seconds: 30), 'icon': Icons.replay_30},
+      {'label': '1m', 'duration': const Duration(minutes: 1), 'icon': Icons.fast_rewind},
+      {'label': '5m', 'duration': const Duration(minutes: 5), 'icon': Icons.skip_previous},
+    ];
+    
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: seekOptions.map((option) {
+        return _buildQuickSeekButton(
+          context,
+          state,
+          option['label'] as String,
+          option['duration'] as Duration,
+          option['icon'] as IconData,
+        );
+      }).toList(),
+    );
+  }
+
+  /// Build individual quick seek button
+  Widget _buildQuickSeekButton(
+    BuildContext context,
+    AudioPlayerState state,
+    String label,
+    Duration duration,
+    IconData icon,
+  ) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          final newPosition = state.currentPosition + duration;
+          final clampedPosition = Duration(
+            milliseconds: newPosition.inMilliseconds.clamp(
+              0,
+              state.totalDuration.inMilliseconds,
+            ),
+          );
+          context.read<AudioPlayerBloc>().add(SeekEvent(clampedPosition));
+          HapticFeedback.lightImpact();
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -414,49 +768,161 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        // Skip backward
-        IconButton(
+        // Skip backward with animation
+        _buildAnimatedControlButton(
+          context: context,
+          icon: Icons.replay_30,
+          tooltip: 'Skip Backward 30s',
           onPressed: state.isLoadingState ? null : () {
             context.read<AudioPlayerBloc>().add(const SkipBackwardEvent());
+            HapticFeedback.lightImpact();
           },
-          icon: const Icon(Icons.replay_30),
-          iconSize: 32,
+          size: 32,
+          isSecondary: true,
         ),
         
-        // Play/Pause button
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.primary,
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: IconButton(
-            onPressed: state.isLoadingState ? null : () {
-              context.read<AudioPlayerBloc>().add(const TogglePlayPauseEvent());
-            },
-            icon: Icon(
-              state.isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.white,
-            ),
-            iconSize: 48,
-          ),
+        // Previous chapter
+        _buildAnimatedControlButton(
+          context: context,
+          icon: Icons.skip_previous,
+          tooltip: 'Previous Chapter',
+          onPressed: state.isLoadingState ? null : () {
+            context.read<AudioPlayerBloc>().add(const SkipBackwardEvent());
+            HapticFeedback.lightImpact();
+          },
+          size: 36,
+          isSecondary: true,
         ),
         
-        // Skip forward
-        IconButton(
+        // Play/Pause button with enhanced styling
+        _buildPlayPauseButton(context, state),
+        
+        // Next chapter
+        _buildAnimatedControlButton(
+          context: context,
+          icon: Icons.skip_next,
+          tooltip: 'Next Chapter',
           onPressed: state.isLoadingState ? null : () {
             context.read<AudioPlayerBloc>().add(const SkipForwardEvent());
+            HapticFeedback.lightImpact();
           },
-          icon: const Icon(Icons.forward_30),
-          iconSize: 32,
+          size: 36,
+          isSecondary: true,
+        ),
+        
+        // Skip forward with animation
+        _buildAnimatedControlButton(
+          context: context,
+          icon: Icons.forward_30,
+          tooltip: 'Skip Forward 30s',
+          onPressed: state.isLoadingState ? null : () {
+            context.read<AudioPlayerBloc>().add(const SkipForwardEvent());
+            HapticFeedback.lightImpact();
+          },
+          size: 32,
+          isSecondary: true,
         ),
       ],
+    );
+  }
+
+  /// Build animated control button
+  Widget _buildAnimatedControlButton({
+    required BuildContext context,
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback? onPressed,
+    required double size,
+    bool isSecondary = false,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            width: isSecondary ? 48 : 56,
+            height: isSecondary ? 48 : 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSecondary 
+                  ? Theme.of(context).colorScheme.surface.withOpacity(0.5)
+                  : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              border: Border.all(
+                color: isSecondary
+                    ? Theme.of(context).colorScheme.outline.withOpacity(0.2)
+                    : Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              ),
+            ),
+            child: Icon(
+              icon,
+              color: onPressed != null 
+                  ? (isSecondary 
+                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.8)
+                      : Theme.of(context).colorScheme.primary)
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+              size: size,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build enhanced play/pause button
+  Widget _buildPlayPauseButton(BuildContext context, AudioPlayerState state) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: state.isLoadingState ? null : () {
+            context.read<AudioPlayerBloc>().add(const TogglePlayPauseEvent());
+            HapticFeedback.mediumImpact();
+          },
+          borderRadius: BorderRadius.circular(40),
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                state.isPlaying ? Icons.pause : Icons.play_arrow,
+                color: Colors.white,
+                size: 36,
+                key: ValueKey(state.isPlaying),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -465,60 +931,140 @@ class _AudioPlayerViewState extends State<_AudioPlayerView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        // Playback speed
+        // Playback speed control
         _buildSpeedControl(context, state),
         
-        // Stop button
-        IconButton(
-          onPressed: state.isLoadingState ? null : () {
-            context.read<AudioPlayerBloc>().add(const StopPlaybackEvent());
-          },
-          icon: const Icon(Icons.stop),
-          iconSize: 24,
-        ),
+        // Volume control
+        _buildVolumeControl(context, state),
         
         // Sleep timer
-        IconButton(
-          onPressed: () {
-            _showSleepTimerDialog(context);
+        _buildSleepTimerControl(context, state),
+        
+        // Stop button
+        _buildAnimatedControlButton(
+          context: context,
+          icon: Icons.stop,
+          tooltip: 'Stop Playback',
+          onPressed: state.isLoadingState ? null : () {
+            context.read<AudioPlayerBloc>().add(const StopPlaybackEvent());
+            HapticFeedback.lightImpact();
           },
-          icon: const Icon(Icons.timer),
-          iconSize: 24,
+          size: 24,
+          isSecondary: true,
         ),
       ],
     );
   }
 
-  /// Build speed control
+  /// Build enhanced speed control
   Widget _buildSpeedControl(BuildContext context, AudioPlayerState state) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.speed, size: 20),
-        const SizedBox(width: 8),
-        Text(
-          state.formattedPlaybackSpeed,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w500,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.speed,
+            size: 18,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            state.formattedPlaybackSpeed,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 4),
+          PopupMenuButton<double>(
+            onSelected: (speed) {
+              context.read<AudioPlayerBloc>().add(SetPlaybackSpeedEvent(speed));
+              HapticFeedback.lightImpact();
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 0.5, child: Text('0.5x')),
+              const PopupMenuItem(value: 0.75, child: Text('0.75x')),
+              const PopupMenuItem(value: 1.0, child: Text('1.0x')),
+              const PopupMenuItem(value: 1.25, child: Text('1.25x')),
+              const PopupMenuItem(value: 1.5, child: Text('1.5x')),
+              const PopupMenuItem(value: 2.0, child: Text('2.0x')),
+              const PopupMenuItem(value: 3.0, child: Text('3.0x')),
+            ],
+            child: Icon(
+              Icons.arrow_drop_down,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build volume control
+  Widget _buildVolumeControl(BuildContext context, AudioPlayerState state) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          // TODO: Implement volume control
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Volume control coming soon')),
+          );
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            ),
+          ),
+          child: Icon(
+            Icons.volume_up,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+            size: 20,
           ),
         ),
-        const SizedBox(width: 8),
-        PopupMenuButton<double>(
-          onSelected: (speed) {
-            context.read<AudioPlayerBloc>().add(SetPlaybackSpeedEvent(speed));
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(value: 0.5, child: Text('0.5x')),
-            const PopupMenuItem(value: 0.75, child: Text('0.75x')),
-            const PopupMenuItem(value: 1.0, child: Text('1.0x')),
-            const PopupMenuItem(value: 1.25, child: Text('1.25x')),
-            const PopupMenuItem(value: 1.5, child: Text('1.5x')),
-            const PopupMenuItem(value: 2.0, child: Text('2.0x')),
-            const PopupMenuItem(value: 3.0, child: Text('3.0x')),
-          ],
-          child: const Icon(Icons.arrow_drop_down),
+      ),
+    );
+  }
+
+  /// Build sleep timer control
+  Widget _buildSleepTimerControl(BuildContext context, AudioPlayerState state) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          _showSleepTimerDialog(context);
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            ),
+          ),
+          child: Icon(
+            Icons.timer,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+            size: 20,
+          ),
         ),
-      ],
+      ),
     );
   }
 

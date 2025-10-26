@@ -153,6 +153,16 @@ class UpdateCurrentAudiobookEvent extends AudioPlayerEvent {
   List<Object?> get props => [audiobook];
 }
 
+/// Event to update playback speed (internal)
+class UpdatePlaybackSpeedEvent extends AudioPlayerEvent {
+  final double speed;
+
+  const UpdatePlaybackSpeedEvent(this.speed);
+
+  @override
+  List<Object?> get props => [speed];
+}
+
 /// Player state enum
 enum AudioPlaybackState {
   stopped,
