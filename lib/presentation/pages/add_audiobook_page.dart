@@ -1005,8 +1005,8 @@ class _AddAudiobookPageState extends State<AddAudiobookPage> {
         // );
 
         final params = CreateAudiobookParams(
-          title: file.title,
-          author: file.author ?? _authorController.text.trim(),
+          title: _titleController.text.trim().isNotEmpty ? _titleController.text.trim() : file.title,
+          author: _authorController.text.trim().isNotEmpty ? _authorController.text.trim() : (file.author ?? 'Unknown Author'),
           narrator: _narratorController.text.trim().isEmpty ? null : _narratorController.text.trim(),
           description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
           genre: file.genre ?? (_genreController.text.trim().isEmpty ? null : _genreController.text.trim()),

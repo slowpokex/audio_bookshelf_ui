@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:io';
 import '../../../presentation/blocs/audio_player/audio_player_bloc.dart';
 import '../../../presentation/blocs/audio_player/audio_player_event.dart';
 import '../../../presentation/blocs/audio_player/audio_player_state.dart';
@@ -60,8 +61,8 @@ class AudioPlayerInfo extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: audiobook.hasCoverImage
-                ? Image.asset(
-                    audiobook.coverImagePath!,
+                ? Image.file(
+                    File(audiobook.coverImagePath!),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return _buildDefaultCover(context);
