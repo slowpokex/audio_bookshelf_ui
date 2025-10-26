@@ -4,12 +4,12 @@ A Flutter application for audio book reading and management, designed to provide
 
 ## 📚 Project Overview
 
-Audio Bookshelf UI is a comprehensive Flutter application that enables users to:
+Audio Bookshelf UI is a comprehensive Flutter mobile application that enables users to:
 - **Read and Listen**: Access a vast library of audio books
 - **Manage Library**: Organize, categorize, and manage personal audio book collections
 - **Track Progress**: Monitor reading progress and bookmark favorite sections
 - **Discover Content**: Find new books through recommendations and search functionality
-- **Cross-Platform**: Enjoy seamless experience across mobile, tablet, and desktop devices
+- **Mobile-First**: Optimized for Android and iOS devices
 
 ## 🎯 Key Features
 
@@ -55,10 +55,12 @@ This project follows a modern Flutter architecture with AI-enhanced capabilities
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Flutter SDK (3.0 or higher)
-- Dart SDK (3.0 or higher)
+- Flutter SDK (3.16.0 or higher)
+- Dart SDK (3.4.4 or higher)
 - Android Studio / VS Code with Flutter extensions
 - Git
+- Android SDK (for Android development)
+- Xcode (for iOS development on macOS)
 
 ### Installation
 
@@ -118,9 +120,15 @@ This project follows a modern Flutter architecture with AI-enhanced capabilities
   - App Store distribution
   - iOS accessibility features
 
-### Additional Platforms
-- **Web**: Modern browsers with audio support
-- **Desktop**: Windows, macOS, Linux
+### Build Commands
+```bash
+# Android
+flutter build apk --release        # APK for Android
+flutter build appbundle --release  # AAB for Google Play Store
+
+# iOS
+flutter build ios --release         # iOS build (requires macOS and Xcode)
+```
 
 ## 🛠️ Technology Stack
 
@@ -435,10 +443,10 @@ Text(AppLocalizations.of(context)!.booksAvailable(bookCount))
 # Debug build
 flutter run --debug
 
-# Release build
-flutter build apk --release
-flutter build ios --release
-flutter build web --release
+# Release builds for mobile platforms
+flutter build apk --release        # Android APK
+flutter build appbundle --release  # Android App Bundle
+flutter build ios --release        # iOS build (requires macOS)
 ```
 
 ### CI/CD Pipeline

@@ -53,7 +53,5 @@ You can customize the icon by editing `app_icon.svg`. The SVG uses:
 Icons are automatically generated for:
 - ✅ iOS (iPhone & iPad)
 - ✅ Android (Adaptive Icons)
-- ✅ Web (PWA)
-- ✅ Windows
-- ✅ macOS
-- ✅ Linux
+- ✅ Android
+- ✅ iOS

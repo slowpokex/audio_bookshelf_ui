@@ -1,7 +1,5 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../core/services/database_service.dart';
 import '../../core/utils/app_logger.dart';
@@ -59,45 +57,26 @@ class AudiobookLocalDataSource {
   Future<Database> _initDatabase() async {
     AppLogger.logDatabaseOperation('_initDatabase', 'audiobook_local_data_source');
     
-    if (kIsWeb) {
-      AppLogger.logDebug('Web platform detected, using in-memory database');
-      // For web, we need to use a different approach
-      // Use in-memory database with proper web initialization
-      return await _initWebDatabase();
-    } else {
-      AppLogger.logDebug('Desktop/mobile platform detected, using file database');
-      // For mobile and desktop platforms
-      // Database factory is already initialized via DatabaseService.ensureInitialized()
-      final documentsDirectory = await getApplicationDocumentsDirectory();
-      final path = '${documentsDirectory.path}/$_databaseName';
-      AppLogger.logDebug('Database path: $path');
-      
-      try {
-        final db = await openDatabase(
-          path,
-          version: _databaseVersion,
-          onCreate: _onCreate,
-          onUpgrade: _onUpgrade,
-        );
-        AppLogger.logDatabaseOperation('open_database', 'audiobook_local_data_source', duration: 0);
-        return db;
-      } catch (e) {
-        AppLogger.logDatabaseError('open_database', 'audiobook_local_data_source', e.toString(), StackTrace.current);
-        rethrow;
-      }
+    AppLogger.logDebug('Mobile platform detected, using file database');
+    // For mobile platforms (Android/iOS)
+    // Database factory is already initialized via DatabaseService.ensureInitialized()
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final path = '${documentsDirectory.path}/$_databaseName';
+    AppLogger.logDebug('Database path: $path');
+    
+    try {
+      final db = await openDatabase(
+        path,
+        version: _databaseVersion,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+      );
+      AppLogger.logDatabaseOperation('open_database', 'audiobook_local_data_source', duration: 0);
+      return db;
+    } catch (e) {
+      AppLogger.logDatabaseError('open_database', 'audiobook_local_data_source', e.toString(), StackTrace.current);
+      rethrow;
     }
-  }
-  
-  /// Initialize database for web platform
-  Future<Database> _initWebDatabase() async {
-    // For web, we'll use an in-memory database
-    // This avoids the SQLite database factory issues on web
-    return await openDatabase(
-      ':memory:',
-      version: _databaseVersion,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-    );
   }
 
   /// Creates the database tables

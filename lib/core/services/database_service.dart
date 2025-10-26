@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 import '../utils/app_logger.dart';
 
@@ -19,21 +16,9 @@ class DatabaseService {
     try {
       AppLogger.logDatabaseOperation('initialize', 'database_service');
       
-      if (kIsWeb) {
-        AppLogger.logDebug('Web platform detected - using default database factory');
-        // For web, use the default database factory
-        // No additional initialization needed for web
-      } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        AppLogger.logDebug('Desktop platform detected - initializing FFI');
-        // Initialize FFI for desktop platforms
-        sqfliteFfiInit();
-        databaseFactory = databaseFactoryFfi;
-        AppLogger.logDebug('FFI initialized, databaseFactory set to databaseFactoryFfi');
-      } else {
-        AppLogger.logDebug('Mobile platform detected - using default database factory');
-        // For mobile platforms (Android/iOS), no additional initialization needed
-      }
-
+      // Mobile platforms (Android/iOS) don't require additional initialization
+      AppLogger.logDebug('Mobile platform detected - using default database factory');
+      
       _isInitialized = true;
       AppLogger.logDatabaseOperation('initialize', 'database_service', duration: 0);
     } catch (e) {
@@ -51,21 +36,6 @@ class DatabaseService {
       await initialize();
     } else {
       AppLogger.logDebug('Already initialized');
-    }
-    
-    // Double-check that databaseFactory is set for desktop platforms only
-    if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-      AppLogger.logDebug('Verifying databaseFactory for desktop platform');
-      if (databaseFactory != databaseFactoryFfi) {
-        AppLogger.logDebug('databaseFactory not set correctly, re-initializing FFI');
-        sqfliteFfiInit();
-        databaseFactory = databaseFactoryFfi;
-        AppLogger.logDebug('FFI re-initialized, databaseFactory corrected');
-      } else {
-        AppLogger.logDebug('databaseFactory is correctly set');
-      }
-    } else {
-      AppLogger.logDebug('Web or mobile platform - no FFI verification needed');
     }
     
     AppLogger.logDebug('ensureInitialized completed');
