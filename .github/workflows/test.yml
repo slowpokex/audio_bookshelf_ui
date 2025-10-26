@@ -1,8 +1,6 @@
 name: Audio Bookshelf UI - Test Suite
 
 on:
-  push:
-    branches: [ main, develop, feature/* ]
   pull_request:
     branches: [ main, develop ]
 
