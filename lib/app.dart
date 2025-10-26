@@ -5,10 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
 import 'core/constants/app_constants.dart';
+import 'core/services/audio_player_service.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/pages/add_audiobook_page.dart';
+import 'presentation/pages/audio_player_page.dart';
 import 'presentation/widgets/loading/splash_screen.dart';
+import 'presentation/widgets/audio_player/audio_player_mini.dart';
 import 'presentation/blocs/audiobook/audiobook_bloc.dart';
+import 'presentation/blocs/audio_player/audio_player_bloc.dart';
 import 'application/use_cases/audiobook_use_cases.dart';
 import 'infrastructure/repositories/audiobook_repository_impl.dart';
 import 'infrastructure/data_sources/audiobook_local_data_source.dart';
@@ -33,6 +37,11 @@ class AudioBookshelfApp extends StatelessWidget {
             rateAudiobookUseCase: RateAudiobookUseCase(_audiobookRepository),
             searchAudiobooksUseCase: SearchAudiobooksUseCase(_audiobookRepository),
             getRecommendationsUseCase: GetRecommendationsUseCase(_audiobookRepository),
+          ),
+        ),
+        BlocProvider<AudioPlayerBloc>(
+          create: (context) => AudioPlayerBloc(
+            audioPlayerService: AudioPlayerService(),
           ),
         ),
       ],
@@ -122,6 +131,11 @@ final GoRouter _router = GoRouter(
       path: '/add-audiobook',
       name: 'add-audiobook',
       builder: (context, state) => const AddAudiobookPage(),
+    ),
+    GoRoute(
+      path: '/audio-player',
+      name: 'audio-player',
+      builder: (context, state) => const AudioPlayerPage(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

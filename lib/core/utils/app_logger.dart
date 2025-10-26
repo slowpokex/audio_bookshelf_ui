@@ -14,14 +14,26 @@ class AppLogger {
     });
   }
   
+  /// Log audio operations
+  static void logAudioOperation(String operation, String component, {int? duration, Map<String, dynamic>? extra}) {
+    _logger.info('Audio Operation: $operation in $component', extra: {
+      'category': 'Audio Playback',
+      'operation': operation,
+      'component': component,
+      'duration': duration,
+      'extra': extra,
+    });
+  }
+  
   /// Log audio playback errors
-  static void logAudioError(String error, StackTrace? stackTrace, Map<String, dynamic>? context) {
-    _logger.error('Audio Error: $error', 
+  static void logAudioError(String operation, String component, String error, StackTrace? stackTrace) {
+    _logger.error('Audio Error: $operation in $component - $error', 
       stackTrace: stackTrace,
       extra: {
         'category': 'Audio Playback',
+        'operation': operation,
+        'component': component,
         'error': error,
-        'context': context,
       }
     );
   }

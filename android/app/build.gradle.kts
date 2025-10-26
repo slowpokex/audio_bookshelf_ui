@@ -115,4 +115,14 @@ dependencies {
     
     // Multi-dex support for apps with many methods
     implementation("androidx.multidex:multidex:2.0.1")
+    
+    // Media session support for background audio
+    implementation("androidx.media:media:1.7.0")
+    implementation("androidx.media3:media3-session:1.2.1")
+    implementation("androidx.media3:media3-common:1.2.1")
+    implementation("androidx.media3:media3-exoplayer:1.2.1")
+    
+    // Support library for notifications
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
 }

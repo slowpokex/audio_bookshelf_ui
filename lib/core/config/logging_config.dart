@@ -4,15 +4,15 @@ import '../utils/logger.dart';
 /// Logging configuration for the Audio Bookshelf UI application
 class LoggingConfig {
   static const String _configYaml = '''
-# Logging configuration
-logging:
-  level: INFO
-  console_output: true
-  file_output: true
-  max_file_size: 10MB
-  max_files: 5
-  include_stack_trace: true
-  structured_format: true
+  # Logging configuration
+  logging:
+    level: INFO
+    console_output: true
+    file_output: true
+    max_file_size: 10MB
+    max_files: 5
+    include_stack_trace: true
+    structured_format: true
 ''';
 
   /// Get the appropriate log level based on environment

@@ -166,11 +166,14 @@ class _SimpleAnimatedLogoState extends State<SimpleAnimatedLogo>
                 borderRadius: BorderRadius.circular(2),
               ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: List.generate(3, (index) {
-                  return Container(
-                    height: 1,
-                    margin: const EdgeInsets.symmetric(vertical: 2),
-                    color: color.withValues(alpha: opacity * 0.3),
+                  return Flexible(
+                    child: Container(
+                      height: 1,
+                      margin: const EdgeInsets.symmetric(vertical: 1),
+                      color: color.withValues(alpha: opacity * 0.3),
+                    ),
                   );
                 }),
               ),

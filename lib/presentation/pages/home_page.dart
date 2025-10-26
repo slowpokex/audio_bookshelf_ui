@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../blocs/audiobook/audiobook_bloc.dart';
+import '../blocs/audio_player/audio_player_bloc.dart';
+import '../blocs/audio_player/audio_player_event.dart';
 import '../widgets/loading/simple_loading_widget.dart';
 import '../widgets/common/app_icon.dart';
+import '../widgets/audio_player/audio_player_mini.dart';
 
 /// Home page displaying the audiobook library
 class HomePage extends StatefulWidget {
@@ -254,6 +257,16 @@ class _HomePageState extends State<HomePage> {
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              // Play button
+                              IconButton(
+                                icon: const Icon(Icons.play_arrow),
+                                onPressed: () {
+                                  context.read<AudioPlayerBloc>().add(
+                                    PlayAudiobookEvent(audiobook),
+                                  );
+                                },
+                                tooltip: 'Play',
+                              ),
                               IconButton(
                                 icon: Icon(
                                   audiobook.isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -264,12 +277,14 @@ class _HomePageState extends State<HomePage> {
                                     ToggleFavoriteEvent(audiobook.id),
                                   );
                                 },
+                                tooltip: 'Toggle Favorite',
                               ),
                               IconButton(
                                 icon: const Icon(Icons.star_border),
                                 onPressed: () {
                                   // TODO: Implement rating dialog
                                 },
+                                tooltip: 'Rate',
                               ),
                             ],
                           ),
@@ -294,6 +309,7 @@ class _HomePageState extends State<HomePage> {
         },
         child: const Icon(Icons.add),
       ),
+      bottomNavigationBar: const AudioPlayerMini(),
     );
   }
 
