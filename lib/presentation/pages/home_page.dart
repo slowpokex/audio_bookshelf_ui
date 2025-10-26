@@ -108,11 +108,17 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const AppBarIcon(),
-            const SizedBox(width: 12),
-            const Text('Audio Bookshelf'),
+            AppBarIcon(),
+            SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                'Audio Bookshelf',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         actions: [
