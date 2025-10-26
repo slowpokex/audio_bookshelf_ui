@@ -317,7 +317,6 @@ class FileImportService {
       if (sdkVersion >= _android13SdkVersion) {
         try {
           final audioStatus = await Permission.audio.status;
-          final photosStatus = await Permission.photos.status;
           // Audio is required, photos is optional
           return audioStatus.isGranted;
         } catch (e) {
@@ -377,13 +376,6 @@ class FileImportService {
     }
   }
 
-  /// Checks if the device is running Android 13 or above (backward compatibility)
-  static Future<bool> _isAndroid13OrAbove() async {
-    if (!Platform.isAndroid) return false;
-    final sdkVersion = await _getAndroidSdkVersion();
-    return sdkVersion >= _android13SdkVersion;
-  }
-
   /// Gets app documents directory
   static Future<String> getAppDocumentsDirectory() async {
     try {
@@ -392,12 +384,22 @@ class FileImportService {
       final directory = await getApplicationDocumentsDirectory();
       return directory.path;
     } catch (e) {
-      // Fallback to the old approach if path_provider fails
-      final directory = Directory('/storage/emulated/0/Android/data/com.example.audio_bookshelf_ui/files');
-      if (!await directory.exists()) {
-        await directory.create(recursive: true);
+      // Fallback: try Android storage location
+      try {
+        final directory = Directory('/storage/emulated/0/Android/data/com.example.audio_bookshelf_ui/files');
+        if (!await directory.exists()) {
+          await directory.create(recursive: true);
+        }
+        return directory.path;
+      } catch (permissionError) {
+        // If Android path fails (e.g., in CI), use system temp directory
+        final tempDir = Directory.systemTemp;
+        final fallbackDir = Directory(path.join(tempDir.path, 'audio_bookshelf_ui'));
+        if (!await fallbackDir.exists()) {
+          await fallbackDir.create(recursive: true);
+        }
+        return fallbackDir.path;
       }
-      return directory.path;
     }
   }
 
