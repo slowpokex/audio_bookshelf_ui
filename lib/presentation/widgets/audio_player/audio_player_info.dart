@@ -78,7 +78,7 @@ class AudioPlayerInfo extends StatelessWidget {
   /// Build default cover when no image is available
   Widget _buildDefaultCover(BuildContext context) {
     return Container(
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       child: Icon(
         Icons.audiotrack,
         color: Theme.of(context).colorScheme.primary,
@@ -118,7 +118,7 @@ class AudioPlayerInfo extends StatelessWidget {
                 Text(
                   audiobook.displayAuthor,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -152,9 +152,9 @@ class AudioPlayerInfo extends StatelessWidget {
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
                 trackHeight: 4,
                 activeTrackColor: Theme.of(context).colorScheme.primary,
-                inactiveTrackColor: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                inactiveTrackColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                 thumbColor: Theme.of(context).colorScheme.primary,
-                overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                overlayColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                 overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
               ),
               child: Slider(

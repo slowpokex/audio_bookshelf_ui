@@ -303,7 +303,7 @@ class AppTheme {
         activeTrackColor: AppColors.primaryGreen,
         inactiveTrackColor: AppColors.gray300,
         thumbColor: AppColors.primaryGreen,
-        overlayColor: AppColors.primaryGreenLight.withOpacity(0.2),
+        overlayColor: AppColors.primaryGreenLight.withValues(alpha: 0.2),
         valueIndicatorColor: AppColors.primaryGreen,
         valueIndicatorTextStyle: const TextStyle(
           color: Colors.white,
@@ -629,7 +629,7 @@ class AppTheme {
         activeTrackColor: AppColors.limeGreen,
         inactiveTrackColor: AppColors.gray700,
         thumbColor: AppColors.limeGreen,
-        overlayColor: AppColors.limeGreenDark.withOpacity(0.2),
+        overlayColor: AppColors.limeGreenDark.withValues(alpha: 0.2),
         valueIndicatorColor: AppColors.limeGreen,
         valueIndicatorTextStyle: const TextStyle(
           color: AppColors.darkBackground,
