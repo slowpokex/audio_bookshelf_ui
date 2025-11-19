@@ -47,7 +47,7 @@ class AudioPlayerMini extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Theme.of(context).colorScheme.error.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
       child: Row(
         children: [
           Icon(

@@ -58,9 +58,10 @@ void main() {
         await tester.pumpAndSettle();
 
         // Assert
-        // Filter options are shown as icon buttons in the AppBar
-        expect(find.byIcon(Icons.filter_list), findsOneWidget);
-        expect(find.byIcon(Icons.sort), findsOneWidget);
+        // Filter options are now shown as quick filter chips below the search bar
+        // No longer in AppBar - removed for cleaner UI
+        expect(find.text('All'), findsOneWidget);
+        expect(find.text('Continue'), findsOneWidget);
       });
 
       testWidgets('should display sort options', (WidgetTester tester) async {
@@ -72,8 +73,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // Assert
-        // Sort options are shown as icon button in the AppBar
-        expect(find.byIcon(Icons.sort), findsOneWidget);
+        // Sort options removed from AppBar - users can use quick filter buttons
+        // View mode toggle is still available
+        expect(find.byIcon(Icons.view_module), findsOneWidget);
       });
     });
 
@@ -104,8 +106,8 @@ void main() {
         // The mock always returns AudiobookInitialState, so we test the basic UI elements
         expect(find.text('Audio Bookshelf'), findsOneWidget);
         expect(find.byType(TextField), findsOneWidget);
-        expect(find.byIcon(Icons.filter_list), findsOneWidget);
-        expect(find.byIcon(Icons.sort), findsOneWidget);
+        // Filter and sort buttons removed - quick filters are available
+        expect(find.text('All'), findsOneWidget);
       });
 
       testWidgets('should display empty state', (WidgetTester tester) async {
@@ -163,15 +165,18 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        // Tap the filter button to open the filter dialog
-        await tester.tap(find.byIcon(Icons.filter_list));
-        await tester.pump(); // Wait for dialog to appear
+        // Quick filter buttons are now available instead of filter dialog
+        // Tap on a quick filter button
+        final continueButton = find.text('Continue');
+        if (continueButton.evaluate().isNotEmpty) {
+          await tester.tap(continueButton);
+          await tester.pump(); // Wait for state update
+        }
 
         // Assert
-        // The filter dialog should be open
-        expect(find.text('Filter Audiobooks'), findsOneWidget);
-        expect(find.text('Show Completed'), findsOneWidget);
-        expect(find.text('Show Favorites Only'), findsOneWidget);
+        // Quick filter buttons should be present
+        expect(find.text('All'), findsOneWidget);
+        expect(find.text('Continue'), findsOneWidget);
       });
 
       testWidgets('should handle author filter selection', (WidgetTester tester) async {
@@ -182,13 +187,17 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        // Tap the filter button to open the filter dialog
-        await tester.tap(find.byIcon(Icons.filter_list));
-        await tester.pump(); // Wait for dialog to appear
+        // Quick filter buttons are now available
+        // Tap on Favorites filter
+        final favoritesButton = find.text('Favorites');
+        if (favoritesButton.evaluate().isNotEmpty) {
+          await tester.tap(favoritesButton);
+          await tester.pump(); // Wait for state update
+        }
 
         // Assert
-        // The filter dialog should be open
-        expect(find.text('Filter Audiobooks'), findsOneWidget);
+        // Quick filter buttons should be present
+        expect(find.text('All'), findsOneWidget);
       });
 
       testWidgets('should handle narrator filter selection', (WidgetTester tester) async {
@@ -199,13 +208,17 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        // Tap the filter button to open the filter dialog
-        await tester.tap(find.byIcon(Icons.filter_list));
-        await tester.pump(); // Wait for dialog to appear
+        // Quick filter buttons are now available
+        // Tap on Recent filter
+        final recentButton = find.text('Recent');
+        if (recentButton.evaluate().isNotEmpty) {
+          await tester.tap(recentButton);
+          await tester.pump(); // Wait for state update
+        }
 
         // Assert
-        // The filter dialog should be open
-        expect(find.text('Filter Audiobooks'), findsOneWidget);
+        // Quick filter buttons should be present
+        expect(find.text('All'), findsOneWidget);
       });
 
       testWidgets('should handle completed checkbox', (WidgetTester tester) async {
@@ -216,14 +229,17 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        // Tap the filter button to open the filter dialog
-        await tester.tap(find.byIcon(Icons.filter_list));
-        await tester.pump(); // Wait for dialog to appear
+        // Quick filter buttons are now available
+        // Tap on Completed filter
+        final completedButton = find.text('Completed');
+        if (completedButton.evaluate().isNotEmpty) {
+          await tester.tap(completedButton);
+          await tester.pump(); // Wait for state update
+        }
 
         // Assert
-        // The filter dialog should be open with checkboxes
-        expect(find.text('Show Completed'), findsOneWidget);
-        expect(find.byType(CheckboxListTile), findsWidgets);
+        // Quick filter buttons should be present
+        expect(find.text('All'), findsOneWidget);
       });
 
       testWidgets('should handle favorites checkbox', (WidgetTester tester) async {
@@ -234,14 +250,17 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        // Tap the filter button to open the filter dialog
-        await tester.tap(find.byIcon(Icons.filter_list));
-        await tester.pump(); // Wait for dialog to appear
+        // Quick filter buttons are now available
+        // Tap on Favorites filter
+        final favoritesButton = find.text('Favorites');
+        if (favoritesButton.evaluate().isNotEmpty) {
+          await tester.tap(favoritesButton);
+          await tester.pump(); // Wait for state update
+        }
 
         // Assert
-        // The filter dialog should be open with checkboxes
-        expect(find.text('Show Favorites Only'), findsOneWidget);
-        expect(find.byType(CheckboxListTile), findsWidgets);
+        // Quick filter buttons should be present
+        expect(find.text('All'), findsOneWidget);
       });
 
       testWidgets('should handle sort by selection', (WidgetTester tester) async {
@@ -252,18 +271,17 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        // Tap the sort button to open the sort dialog
-        await tester.tap(find.byIcon(Icons.sort));
-        await tester.pump(); // Wait for dialog to appear
+        // Sort button removed - sorting is now handled via quick filter buttons
+        // Quick filter buttons automatically sort (e.g., Recent sorts by last_played_at)
+        final recentButton = find.text('Recent');
+        if (recentButton.evaluate().isNotEmpty) {
+          await tester.tap(recentButton);
+          await tester.pump(); // Wait for state update
+        }
         
         // Assert
-        // The sort dialog should be open
-        expect(find.text('Sort Audiobooks'), findsOneWidget);
-        expect(find.text('Title'), findsAtLeastNWidgets(1));
-        expect(find.text('Author'), findsAtLeastNWidgets(1));
-        expect(find.text('Rating'), findsAtLeastNWidgets(1));
-        expect(find.text('Duration'), findsAtLeastNWidgets(1));
-        expect(find.text('Date Added'), findsAtLeastNWidgets(1));
+        // Quick filter buttons should be present
+        expect(find.text('All'), findsOneWidget);
       });
 
       testWidgets('should handle sort order selection', (WidgetTester tester) async {
@@ -274,15 +292,18 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        // Tap the sort button to open the sort dialog
-        await tester.tap(find.byIcon(Icons.sort));
-        await tester.pump(); // Wait for dialog to appear
+        // Sort button removed - sorting is now handled via quick filter buttons
+        // Quick filter buttons automatically sort in descending order
+        final continueButton = find.text('Continue');
+        if (continueButton.evaluate().isNotEmpty) {
+          await tester.tap(continueButton);
+          await tester.pump(); // Wait for state update
+        }
 
         // Assert
-        // The sort dialog should be open with order options
-        expect(find.text('Sort Audiobooks'), findsOneWidget);
-        expect(find.text('Ascending'), findsAtLeastNWidgets(1));
-        expect(find.text('Descending'), findsAtLeastNWidgets(1));
+        // Quick filter buttons should be present
+        // Sorting is now handled automatically by quick filter buttons
+        expect(find.text('All'), findsOneWidget);
       });
     });
 

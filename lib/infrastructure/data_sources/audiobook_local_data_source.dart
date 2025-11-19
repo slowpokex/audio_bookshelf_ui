@@ -184,38 +184,45 @@ class AudiobookLocalDataSource {
 
     // Build ORDER BY clause
     String orderBy = 'created_at DESC';
-    if (sortBy != null) {
+    if (sortBy != null && sortBy.isNotEmpty) {
+      String columnName;
       switch (sortBy) {
         case 'title':
-          orderBy = 'title';
+          columnName = 'title';
           break;
         case 'author':
-          orderBy = 'author';
+          columnName = 'author';
           break;
         case 'rating':
-          orderBy = 'rating';
+          columnName = 'rating';
           break;
         case 'duration':
-          orderBy = 'duration';
+          columnName = 'duration';
           break;
         case 'created_at':
-          orderBy = 'created_at';
+          columnName = 'created_at';
           break;
         case 'updated_at':
-          orderBy = 'updated_at';
+          columnName = 'updated_at';
           break;
         case 'last_played_at':
-          orderBy = 'last_played_at';
+        case 'last_played': // Support both variants
+          columnName = 'last_played_at';
           break;
         case 'play_count':
-          orderBy = 'play_count';
+          columnName = 'play_count';
+          break;
+        default:
+          // If sortBy doesn't match any case, use default
+          columnName = 'created_at';
           break;
       }
       
+      // Build order by from scratch (no DESC in default)
       if (sortOrder == 'asc') {
-        orderBy += ' ASC';
+        orderBy = '$columnName ASC';
       } else {
-        orderBy += ' DESC';
+        orderBy = '$columnName DESC';
       }
     }
 

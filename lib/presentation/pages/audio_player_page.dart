@@ -138,7 +138,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -156,7 +156,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -173,7 +173,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -190,7 +190,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -237,7 +237,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     Theme.of(context).colorScheme.surface,
                     Theme.of(context).colorScheme.surface,
                   ],
@@ -275,20 +275,20 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
           Icon(
             Icons.audiotrack,
             size: 64,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
             'No audiobook selected',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Select an audiobook to start playing',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
         ],
@@ -342,11 +342,11 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -376,12 +376,12 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 30,
                           offset: const Offset(0, 15),
                         ),
                         BoxShadow(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                           blurRadius: 40,
                           offset: const Offset(0, 20),
                         ),
@@ -412,12 +412,12 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
                                 child: BackdropFilter(
                                   filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
                                   child: Container(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                     child: Center(
                                       child: Container(
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.3),
+                                          color: Colors.black.withValues(alpha: 0.3),
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(
@@ -462,7 +462,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
                     Text(
                       audiobook.displayAuthor,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       textAlign: TextAlign.center,
                       maxLines: 1,
@@ -474,10 +474,10 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
@@ -549,7 +549,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
   /// Build default cover
   Widget _buildDefaultCover(BuildContext context) {
     return Container(
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       child: Icon(
         Icons.audiotrack,
         color: Theme.of(context).colorScheme.primary,
@@ -570,7 +570,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -583,10 +583,10 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Column(
@@ -625,7 +625,7 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -639,14 +639,14 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 state.formattedRemainingTime,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ),
@@ -660,9 +660,9 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 14),
             trackHeight: 8,
             activeTrackColor: Theme.of(context).colorScheme.primary,
-            inactiveTrackColor: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            inactiveTrackColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
             thumbColor: Colors.white,
-            overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+            overlayColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
           ),
           child: Slider(
@@ -735,10 +735,10 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: Row(
@@ -850,21 +850,21 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isSecondary 
-                  ? Theme.of(context).colorScheme.surface.withOpacity(0.5)
-                  : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.5)
+                  : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               border: Border.all(
                 color: isSecondary
-                    ? Theme.of(context).colorScheme.outline.withOpacity(0.2)
-                    : Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)
+                    : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               ),
             ),
             child: Icon(
               icon,
               color: onPressed != null 
                   ? (isSecondary 
-                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.8)
+                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8)
                       : Theme.of(context).colorScheme.primary)
-                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
               size: size,
             ),
           ),
@@ -896,17 +896,17 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
                 end: Alignment.bottomRight,
                 colors: [
                   Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -962,10 +962,10 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -1025,15 +1025,15 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: Icon(
             Icons.volume_up,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
             size: 20,
           ),
         ),
@@ -1053,15 +1053,15 @@ class _AudioPlayerViewState extends State<_AudioPlayerView>
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: Icon(
             Icons.timer,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
             size: 20,
           ),
         ),

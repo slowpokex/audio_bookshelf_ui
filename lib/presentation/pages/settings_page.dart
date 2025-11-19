@@ -123,11 +123,6 @@ class SettingsPage extends StatelessWidget {
           // About Section
           _buildAboutSection(context),
           
-          const SizedBox(height: 32),
-          
-          // Back to Main Screen Button
-          _buildBackToMainButton(context),
-          
           const SizedBox(height: 16),
         ],
       ),
@@ -435,55 +430,6 @@ class SettingsPage extends StatelessWidget {
             child: const Text('Cancel'),
           ),
         ],
-      ),
-    );
-  }
-  
-  Widget _buildBackToMainButton(BuildContext context) {
-    return Center(
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Icon(
-                Icons.home,
-                size: 48,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Back to Main Screen',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Return to the audiobook library',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Navigate back to home screen
-                    context.go('/');
-                  },
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Go to Library'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -32,7 +32,7 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 20,
                 offset: const Offset(0, -8),
               ),
@@ -45,10 +45,10 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
               child: Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Column(
@@ -156,9 +156,9 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
               trackHeight: 3,
               activeTrackColor: Theme.of(context).colorScheme.primary,
-              inactiveTrackColor: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              inactiveTrackColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
               thumbColor: Colors.white, // White thumb like in the image
-              overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              overlayColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
             ),
             child: Slider(
@@ -247,10 +247,10 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -371,8 +371,8 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
           icon: Icon(
             icon,
             color: onPressed != null 
-                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7) // Muted color like in the image
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7) // Muted color like in the image
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           iconSize: size,
           tooltip: tooltip,
@@ -408,17 +408,17 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
                   end: Alignment.bottomRight,
                   colors: [
                     Theme.of(context).colorScheme.primary,
-                    Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
                   ],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -480,7 +480,7 @@ class _AudioPlayerControlsState extends State<AudioPlayerControls> {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
