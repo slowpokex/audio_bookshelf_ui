@@ -14,7 +14,7 @@ class AudioPlayerService {
 
   late AudioPlayer _audioPlayer;
   late AudioSession _audioSession;
-  late BackgroundAudioService _backgroundAudioService;
+  BackgroundAudioService? _backgroundAudioService;
   StreamSubscription<Duration>? _positionSubscription;
   StreamSubscription<Duration?>? _durationSubscription;
   StreamSubscription<PlayerState>? _playerStateSubscription;
@@ -68,12 +68,14 @@ class AudioPlayerService {
       // Initialize background audio service with error handling
       try {
         _backgroundAudioService = BackgroundAudioService.instance;
-        await _backgroundAudioService.initialize();
+        await _backgroundAudioService!.initialize();
+        AppLogger.logDebug('Background audio service initialized successfully');
       } catch (e) {
         AppLogger.logDebug('Background audio service initialization failed, continuing without it', data: {
           'error': e.toString(),
         });
-        // Continue without background service if it fails
+        // Set to null if initialization fails so we know to skip it later
+        _backgroundAudioService = null;
       }
 
       // Initialize audio session
@@ -246,22 +248,24 @@ class AudioPlayerService {
         await seek(audiobook.currentPosition!);
       }
 
-      // Start background service with error handling
-      try {
-        await _backgroundAudioService.startService();
+      // Start background service with error handling (only if available)
+      if (_backgroundAudioService != null) {
+        try {
+          await _backgroundAudioService!.startService();
 
-        // Update metadata for notification
-        await _backgroundAudioService.updateMetadata(
-          title: audiobook.title,
-          artist: audiobook.displayAuthor,
-          album: audiobook.series ?? 'Audiobook',
-          duration: audiobook.duration ?? Duration.zero,
-        );
-      } catch (e) {
-        AppLogger.logDebug('Background service operations failed, continuing without notification', data: {
-          'error': e.toString(),
-        });
-        // Continue without background service if it fails
+          // Update metadata for notification
+          await _backgroundAudioService!.updateMetadata(
+            title: audiobook.title,
+            artist: audiobook.displayAuthor,
+            album: audiobook.series ?? 'Audiobook',
+            duration: audiobook.duration ?? Duration.zero,
+          );
+        } catch (e) {
+          AppLogger.logDebug('Background service operations failed, continuing without notification', data: {
+            'error': e.toString(),
+          });
+          // Continue without background service if it fails
+        }
       }
 
       // Start playback
@@ -320,8 +324,16 @@ class AudioPlayerService {
       AppLogger.logAudioOperation('stop', 'audio_player_service');
       await _audioPlayer.stop();
       
-      // Stop background service
-      await _backgroundAudioService.stopService();
+      // Stop background service (only if available)
+      if (_backgroundAudioService != null) {
+        try {
+          await _backgroundAudioService!.stopService();
+        } catch (e) {
+          AppLogger.logDebug('Failed to stop background service, continuing', data: {
+            'error': e.toString(),
+          });
+        }
+      }
       
       _currentAudiobook = null;
       _currentAudiobookController.add(null);
@@ -410,11 +422,16 @@ class AudioPlayerService {
 
   /// Update background service with position only (for frequent updates)
   void _updateBackgroundServicePosition() {
-    if (_currentAudiobook != null) {
-      _backgroundAudioService.updatePosition(
-        position: _currentPosition,
-        duration: _totalDuration,
-      );
+    if (_currentAudiobook != null && _backgroundAudioService != null) {
+      try {
+        _backgroundAudioService!.updatePosition(
+          position: _currentPosition,
+          duration: _totalDuration,
+        );
+      } catch (e) {
+        // Silently ignore background service errors during position updates
+        // to avoid spamming logs
+      }
     }
   }
 
@@ -493,8 +510,16 @@ class AudioPlayerService {
     
     await _audioPlayer.dispose();
     
-    // Dispose background service
-    await _backgroundAudioService.dispose();
+    // Dispose background service (only if available)
+    if (_backgroundAudioService != null) {
+      try {
+        await _backgroundAudioService!.dispose();
+      } catch (e) {
+        AppLogger.logDebug('Failed to dispose background service', data: {
+          'error': e.toString(),
+        });
+      }
+    }
     
     await _currentAudiobookController.close();
     await _positionController.close();
