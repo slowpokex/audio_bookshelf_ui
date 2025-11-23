@@ -7,10 +7,13 @@ import 'package:http/http.dart' as http;
 import 'core/constants/app_constants.dart';
 import 'core/services/audio_player_service.dart';
 import 'core/services/theme_service.dart';
+import 'core/services/theme_service.dart';
+import 'core/services/sleep_timer_service.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/pages/add_audiobook_page.dart';
 import 'presentation/pages/audio_player_page.dart';
+import 'presentation/pages/audiobook_details_page.dart';
 import 'presentation/pages/settings_page.dart';
 import 'presentation/widgets/loading/splash_screen.dart';
 import 'presentation/blocs/audiobook/audiobook_bloc.dart';
@@ -73,6 +76,9 @@ class _AudioBookshelfAppState extends State<AudioBookshelfApp> {
     _themeBloc = ThemeBloc(
       themeService: ThemeService.instance,
     )..add(const ThemeInitializeEvent());
+
+    // Initialize SleepTimerService
+    SleepTimerService().initialize(_audioPlayerBloc);
   }
 
   @override
@@ -81,6 +87,9 @@ class _AudioBookshelfAppState extends State<AudioBookshelfApp> {
     _themeBloc.close();
     _audioPlayerBloc.close();
     _audiobookBloc.close();
+    
+    // Dispose services
+    SleepTimerService().dispose();
     
     // Dispose HTTP client to prevent memory leaks
     _httpClient.close();
@@ -151,6 +160,14 @@ final _router = GoRouter(
       path: '/settings',
       name: 'settings',
       builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
+      path: '/audiobook-details/:id',
+      name: 'audiobook-details',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return AudiobookDetailsPage(audiobookId: id);
+      },
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

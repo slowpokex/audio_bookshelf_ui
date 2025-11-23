@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../domain/entities/audiobook.dart';
 import '../../blocs/audio_player/audio_player_bloc.dart';
 import '../../blocs/audio_player/audio_player_event.dart';
@@ -75,7 +76,7 @@ class AudiobookCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.red.withValues(alpha: 0.9),
+                        color: Colors.red.withOpacity(0.9),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -93,7 +94,7 @@ class AudiobookCard extends StatelessWidget {
                     right: 0,
                     child: LinearProgressIndicator(
                       value: audiobook.progressPercentage,
-                      backgroundColor: Colors.black.withValues(alpha: 0.3),
+                      backgroundColor: Colors.black.withOpacity(0.3),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         theme.colorScheme.primary,
                       ),
@@ -122,7 +123,7 @@ class AudiobookCard extends StatelessWidget {
                   Text(
                     audiobook.author,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -148,14 +149,14 @@ class AudiobookCard extends StatelessWidget {
                         Icon(
                           Icons.access_time,
                           size: 14,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             _formatDuration(audiobook.duration!),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -200,7 +201,7 @@ class AudiobookCard extends StatelessWidget {
                     Positioned.fill(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                          color: theme.colorScheme.primary.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
@@ -246,7 +247,7 @@ class AudiobookCard extends StatelessWidget {
                     Text(
                       audiobook.author,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -256,7 +257,7 @@ class AudiobookCard extends StatelessWidget {
                       Text(
                         'Narrated by ${audiobook.narrator}',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
                           fontStyle: FontStyle.italic,
                         ),
                         maxLines: 1,
@@ -300,13 +301,13 @@ class AudiobookCard extends StatelessWidget {
                           Icon(
                             Icons.access_time,
                             size: 14,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             _formatDuration(audiobook.duration!),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                         ],
@@ -394,7 +395,7 @@ class AudiobookCard extends StatelessWidget {
     return Container(
       width: size.width,
       height: size.height,
-      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+      color: theme.colorScheme.primaryContainer.withOpacity(0.3),
       child: Icon(
         Icons.library_books,
         color: theme.colorScheme.onPrimaryContainer,
@@ -460,7 +461,7 @@ class AudiobookCard extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+              color: theme.colorScheme.onSurface.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -523,7 +524,10 @@ class AudiobookCard extends StatelessWidget {
             title: const Text('View Details'),
             onTap: () {
               Navigator.pop(context);
-              // TODO: Navigate to details page
+              context.pushNamed(
+                'audiobook-details',
+                pathParameters: {'id': audiobook.id},
+              );
             },
           ),
           ListTile(
@@ -586,4 +590,3 @@ class AudiobookCard extends StatelessWidget {
     }
   }
 }
-

@@ -5,6 +5,7 @@ import 'dart:io';
 import '../blocs/audio_player/audio_player_bloc.dart';
 import '../blocs/audio_player/audio_player_event.dart';
 import '../blocs/audio_player/audio_player_state.dart';
+import '../../core/services/sleep_timer_service.dart';
 
 /// Expanded audio player page with detailed controls
 class ExpandedAudioPlayerPage extends StatelessWidget {
@@ -444,7 +445,10 @@ class ExpandedAudioPlayerPage extends StatelessWidget {
               title: const Text('Off'),
               onTap: () {
                 Navigator.of(context).pop();
-                // TODO: Implement sleep timer off
+                SleepTimerService().stopTimer();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Sleep timer turned off')),
+                );
               },
             ),
             ListTile(
@@ -452,7 +456,10 @@ class ExpandedAudioPlayerPage extends StatelessWidget {
               title: const Text('10 minutes'),
               onTap: () {
                 Navigator.of(context).pop();
-                // TODO: Implement 10 minute timer
+                SleepTimerService().startTimer(const Duration(minutes: 10));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Sleep timer set for 10 minutes')),
+                );
               },
             ),
             ListTile(
@@ -460,7 +467,10 @@ class ExpandedAudioPlayerPage extends StatelessWidget {
               title: const Text('30 minutes'),
               onTap: () {
                 Navigator.of(context).pop();
-                // TODO: Implement 30 minute timer
+                SleepTimerService().startTimer(const Duration(minutes: 30));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Sleep timer set for 30 minutes')),
+                );
               },
             ),
             ListTile(
@@ -468,7 +478,10 @@ class ExpandedAudioPlayerPage extends StatelessWidget {
               title: const Text('1 hour'),
               onTap: () {
                 Navigator.of(context).pop();
-                // TODO: Implement 1 hour timer
+                SleepTimerService().startTimer(const Duration(hours: 1));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Sleep timer set for 1 hour')),
+                );
               },
             ),
           ],
