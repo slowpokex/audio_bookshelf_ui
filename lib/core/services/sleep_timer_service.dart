@@ -11,6 +11,7 @@ class SleepTimerService {
 
   Timer? _sleepTimer;
   Duration? _remainingTime;
+  DateTime? _timerStartTime;
   AudioPlayerBloc? _audioPlayerBloc;
   bool _isActive = false;
 
@@ -31,6 +32,7 @@ class SleepTimerService {
     _sleepTimer?.cancel();
 
     _remainingTime = duration;
+    _timerStartTime = DateTime.now();
     _isActive = true;
 
     _sleepTimer = Timer(duration, () {
@@ -45,27 +47,47 @@ class SleepTimerService {
     _sleepTimer?.cancel();
     _sleepTimer = null;
     _remainingTime = null;
+    _timerStartTime = null;
     _isActive = false;
     AppLogger.logDebug('Sleep timer stopped');
   }
 
   /// Pause sleep timer
   void pauseTimer() {
-    if (_sleepTimer != null && _remainingTime != null) {
+    if (_sleepTimer != null && _remainingTime != null && _timerStartTime != null) {
       _sleepTimer?.cancel();
+      
+      // Calculate actual remaining time based on elapsed time
+      final elapsedTime = DateTime.now().difference(_timerStartTime!);
+      _remainingTime = _remainingTime! - elapsedTime;
+      
+      // Ensure remaining time is not negative
+      if (_remainingTime!.isNegative) {
+        _remainingTime = Duration.zero;
+      }
+      
       _isActive = false;
-      AppLogger.logDebug('Sleep timer paused');
+      _timerStartTime = null;
+      AppLogger.logDebug('Sleep timer paused with ${_remainingTime!.inSeconds}s remaining');
     }
   }
 
   /// Resume sleep timer
   void resumeTimer() {
     if (_remainingTime != null && _audioPlayerBloc != null) {
+      // Don't resume if no time is left
+      if (_remainingTime!.inMilliseconds <= 0) {
+        AppLogger.logDebug('Sleep timer has no remaining time, completing immediately');
+        _onTimerComplete();
+        return;
+      }
+      
+      _timerStartTime = DateTime.now();
       _sleepTimer = Timer(_remainingTime!, () {
         _onTimerComplete();
       });
       _isActive = true;
-      AppLogger.logDebug('Sleep timer resumed');
+      AppLogger.logDebug('Sleep timer resumed with ${_remainingTime!.inSeconds}s remaining');
     }
   }
 
@@ -101,6 +123,7 @@ class SleepTimerService {
     
     _isActive = false;
     _remainingTime = null;
+    _timerStartTime = null;
   }
 
   /// Dispose of resources
@@ -108,6 +131,7 @@ class SleepTimerService {
     _sleepTimer?.cancel();
     _sleepTimer = null;
     _remainingTime = null;
+    _timerStartTime = null;
     _isActive = false;
     _audioPlayerBloc = null;
     AppLogger.logDebug('SleepTimerService disposed');
