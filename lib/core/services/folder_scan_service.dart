@@ -296,10 +296,22 @@ class AudioFileInfo {
 
   /// Formats file size for display
   String get formattedFileSize {
-    if (fileSize < 1024) return '${fileSize}B';
-    if (fileSize < 1024 * 1024) return '${(fileSize / 1024).toStringAsFixed(1)}KB';
-    if (fileSize < 1024 * 1024 * 1024) return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)}MB';
-    return '${(fileSize / (1024 * 1024 * 1024)).toStringAsFixed(1)}GB';
+    if (fileSize <= 0) return '0B';
+    
+    const int bytesPerKilobyte = 1024;
+    const int bytesPerMegabyte = bytesPerKilobyte * 1024;
+    const int bytesPerGigabyte = bytesPerMegabyte * 1024;
+    const int decimalPlaces = 1;
+    
+    if (fileSize < bytesPerKilobyte) {
+      return '${fileSize}B';
+    } else if (fileSize < bytesPerMegabyte) {
+      return '${(fileSize / bytesPerKilobyte).toStringAsFixed(decimalPlaces)}KB';
+    } else if (fileSize < bytesPerGigabyte) {
+      return '${(fileSize / bytesPerMegabyte).toStringAsFixed(decimalPlaces)}MB';
+    } else {
+      return '${(fileSize / bytesPerGigabyte).toStringAsFixed(decimalPlaces)}GB';
+    }
   }
 
   /// Formats duration for display

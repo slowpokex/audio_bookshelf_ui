@@ -91,7 +91,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       await _playbackSpeedSubscription?.cancel();
       await _errorSubscription?.cancel();
       
-      await _audioPlayerService.dispose();
+      // DO NOT dispose the AudioPlayerService singleton here
+      // The service is shared across the app and should only be disposed
+      // when the entire app is shutting down, not when individual blocs are closed.
       
       emit(const AudioPlayerState.initial());
       
