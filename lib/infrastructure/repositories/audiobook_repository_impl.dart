@@ -62,9 +62,9 @@ class AudiobookRepositoryImpl implements AudiobookRepository {
         sortOrder: sortOrder,
       );
 
-      // Cache the remote data locally
-      for (final audiobook in remoteAudiobooks) {
-        await _localDataSource.cacheAudiobook(audiobook);
+      // Cache the remote data locally using batch operation for better performance
+      if (remoteAudiobooks.isNotEmpty) {
+        await _localDataSource.cacheAudiobooks(remoteAudiobooks);
       }
 
       return remoteAudiobooks.map((model) => model.toEntity()).toList();
@@ -193,9 +193,9 @@ class AudiobookRepositoryImpl implements AudiobookRepository {
         filters: filters,
       );
 
-      // Cache the remote results locally
-      for (final audiobook in remoteAudiobooks) {
-        await _localDataSource.cacheAudiobook(audiobook);
+      // Cache the remote results locally using batch operation for better performance
+      if (remoteAudiobooks.isNotEmpty) {
+        await _localDataSource.cacheAudiobooks(remoteAudiobooks);
       }
 
       return remoteAudiobooks.map((model) => model.toEntity()).toList();
@@ -226,9 +226,9 @@ class AudiobookRepositoryImpl implements AudiobookRepository {
         basedOn: basedOn,
       );
 
-      // Cache the recommendations locally
-      for (final audiobook in remoteRecommendations) {
-        await _localDataSource.cacheAudiobook(audiobook);
+      // Cache the recommendations locally using batch operation for better performance
+      if (remoteRecommendations.isNotEmpty) {
+        await _localDataSource.cacheAudiobooks(remoteRecommendations);
       }
 
       return remoteRecommendations.map((model) => model.toEntity()).toList();

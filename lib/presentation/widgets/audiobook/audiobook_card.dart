@@ -5,9 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../../domain/entities/audiobook.dart';
 import '../../blocs/audio_player/audio_player_bloc.dart';
 import '../../blocs/audio_player/audio_player_event.dart';
+import '../../blocs/audio_player/audio_player_state.dart';
 import '../../blocs/audiobook/audiobook_bloc.dart';
 
-/// Enhanced audiobook card widget with modern design and rich information
+/// Enhanced audiobook card widget with modern design and rich information.
+/// Uses BlocSelector for optimized rebuilds - only rebuilds when the playing
+/// state for this specific audiobook changes.
 class AudiobookCard extends StatelessWidget {
   final Audiobook audiobook;
   final bool isGridView;
@@ -24,17 +27,23 @@ class AudiobookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isGridView) {
-      return _buildGridCard(context);
-    } else {
-      return _buildListCard(context);
-    }
+    // Use BlocSelector to only rebuild when the playing state for this
+    // specific audiobook changes, rather than on every audio player state change
+    return BlocSelector<AudioPlayerBloc, AudioPlayerState, bool>(
+      selector: (state) => state.currentAudiobook?.id == audiobook.id && state.isPlaying,
+      builder: (context, isCurrentlyPlaying) {
+        if (isGridView) {
+          return _buildGridCard(context, isCurrentlyPlaying);
+        } else {
+          return _buildListCard(context, isCurrentlyPlaying);
+        }
+      },
+    );
   }
 
   /// Build grid view card (compact)
-  Widget _buildGridCard(BuildContext context) {
+  Widget _buildGridCard(BuildContext context, bool isCurrentlyPlaying) {
     final theme = Theme.of(context);
-    final isCurrentlyPlaying = _isCurrentlyPlaying(context);
     
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -175,9 +184,8 @@ class AudiobookCard extends StatelessWidget {
   }
 
   /// Build list view card (detailed)
-  Widget _buildListCard(BuildContext context) {
+  Widget _buildListCard(BuildContext context, bool isCurrentlyPlaying) {
     final theme = Theme.of(context);
-    final isCurrentlyPlaying = _isCurrentlyPlaying(context);
     
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -402,13 +410,6 @@ class AudiobookCard extends StatelessWidget {
         size: size.width * 0.3,
       ),
     );
-  }
-
-  /// Check if audiobook is currently playing
-  bool _isCurrentlyPlaying(BuildContext context) {
-    final audioPlayerState = context.watch<AudioPlayerBloc>().state;
-    return audioPlayerState.currentAudiobook?.id == audiobook.id &&
-           audioPlayerState.isPlaying;
   }
 
   /// Handle tap on card

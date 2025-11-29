@@ -299,6 +299,25 @@ class AudiobookLocalDataSource {
     );
   }
 
+  /// Batch caches multiple audiobooks efficiently using a transaction.
+  /// This is much faster than calling cacheAudiobook multiple times sequentially.
+  Future<void> cacheAudiobooks(List<AudiobookModel> audiobooks) async {
+    if (audiobooks.isEmpty) return;
+    
+    final db = await database;
+    await db.transaction((txn) async {
+      final batch = txn.batch();
+      for (final audiobook in audiobooks) {
+        batch.insert(
+          _tableName,
+          audiobook.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+      await batch.commit(noResult: true);
+    });
+  }
+
   /// Searches audiobooks
   Future<List<AudiobookModel>> searchAudiobooks({
     required String searchQuery,

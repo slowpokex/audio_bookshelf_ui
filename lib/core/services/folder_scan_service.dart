@@ -12,25 +12,49 @@ class FolderScanService {
     'jpg', 'jpeg', 'png', 'webp'
   ];
 
-  /// Scans a folder for audio files and returns information about each file
+  /// Maximum number of parallel file processing tasks
+  static const int _maxParallelTasks = 10;
+
+  /// Scans a folder for audio files and returns information about each file.
+  /// Uses parallel processing for improved performance on large directories.
   static Future<List<AudioFileInfo>> scanFolderForAudioFiles(String folderPath) async {
-    final List<AudioFileInfo> audioFiles = [];
     final directory = Directory(folderPath);
 
     if (!await directory.exists()) {
       throw Exception('Folder does not exist: $folderPath');
     }
 
+    // Collect all audio files first (fast operation)
+    final audioFilePaths = <File>[];
     await for (final entity in directory.list(recursive: true)) {
       if (entity is File) {
-        final extension = path.extension(entity.path).substring(1).toLowerCase();
-        if (_supportedAudioFormats.contains(extension)) {
-          final fileInfo = await _createAudioFileInfo(entity);
-          if (fileInfo != null) {
-            audioFiles.add(fileInfo);
-          }
+        final extension = path.extension(entity.path).toLowerCase();
+        if (extension.isNotEmpty && _supportedAudioFormats.contains(extension.substring(1))) {
+          audioFilePaths.add(entity);
         }
       }
+    }
+
+    if (audioFilePaths.isEmpty) {
+      return [];
+    }
+
+    // Process files in parallel batches for better performance
+    final List<AudioFileInfo> audioFiles = [];
+    
+    // Process in batches to avoid overwhelming the system
+    for (int i = 0; i < audioFilePaths.length; i += _maxParallelTasks) {
+      final end = (i + _maxParallelTasks > audioFilePaths.length) 
+          ? audioFilePaths.length 
+          : i + _maxParallelTasks;
+      final batch = audioFilePaths.sublist(i, end);
+      
+      // Process batch in parallel
+      final futures = batch.map((file) => _createAudioFileInfo(file));
+      final results = await Future.wait(futures);
+      
+      // Filter out nulls and add to result
+      audioFiles.addAll(results.whereType<AudioFileInfo>());
     }
 
     return audioFiles;
