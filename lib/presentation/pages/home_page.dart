@@ -469,26 +469,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// Build sections view (Continue Reading, Recently Played, etc.)
+  /// Optimized to categorize audiobooks in a single pass for better performance.
   Widget _buildSectionsView(BuildContext context, List<Audiobook> audiobooks) {
-    final continueReading = audiobooks
-        .where((book) => book.isStarted && !book.isCompleted)
-        .toList()
-      ..sort((a, b) {
-        final aTime = a.lastPlayedAt ?? DateTime(2000);
-        final bTime = b.lastPlayedAt ?? DateTime(2000);
-        return bTime.compareTo(aTime);
-      });
-
-    final recentlyPlayed = audiobooks
-        .where((book) => book.lastPlayedAt != null)
-        .toList()
-      ..sort((a, b) {
-        final aTime = a.lastPlayedAt ?? DateTime(2000);
-        final bTime = b.lastPlayedAt ?? DateTime(2000);
-        return bTime.compareTo(aTime);
-      });
-
-    final favorites = audiobooks.where((book) => book.isFavorite).toList();
+    // Single pass categorization for O(n) instead of O(3n)
+    final continueReading = <Audiobook>[];
+    final recentlyPlayed = <Audiobook>[];
+    final favorites = <Audiobook>[];
+    
+    for (final book in audiobooks) {
+      if (book.isStarted && !book.isCompleted) {
+        continueReading.add(book);
+      }
+      if (book.lastPlayedAt != null) {
+        recentlyPlayed.add(book);
+      }
+      if (book.isFavorite) {
+        favorites.add(book);
+      }
+    }
+    
+    // Sort by lastPlayedAt descending (most recent first)
+    int compareByLastPlayed(Audiobook a, Audiobook b) {
+      final aTime = a.lastPlayedAt ?? DateTime(2000);
+      final bTime = b.lastPlayedAt ?? DateTime(2000);
+      return bTime.compareTo(aTime);
+    }
+    
+    continueReading.sort(compareByLastPlayed);
+    recentlyPlayed.sort(compareByLastPlayed);
 
     return ListView(
       controller: _scrollController,
@@ -647,50 +655,50 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// Filter audiobooks based on current filters
+  /// Optimized to apply all filters in a single pass for O(n) complexity.
   List<Audiobook> _filterAudiobooks(List<Audiobook> audiobooks) {
-    List<Audiobook> filtered = List.from(audiobooks);
+    // Pre-compute filter conditions to avoid repeated checks
+    final hasGenreFilter = _selectedGenre.isNotEmpty;
+    final hasAuthorFilter = _selectedAuthor.isNotEmpty;
+    final hasNarratorFilter = _selectedNarrator.isNotEmpty;
+    final hasCompletedFilter = _showCompleted && _filterMode != 'completed';
+    final hasFavoritesFilter = _showFavorites && _filterMode != 'favorites';
+    
+    // Single pass filter combining all conditions
+    final filtered = audiobooks.where((book) {
+      // Apply filter mode conditions
+      switch (_filterMode) {
+        case 'continue':
+          if (!(book.isStarted && !book.isCompleted)) return false;
+          break;
+        case 'favorites':
+          if (!book.isFavorite) return false;
+          break;
+        case 'completed':
+          if (!book.isCompleted) return false;
+          break;
+        case 'recent':
+          if (book.lastPlayedAt == null) return false;
+          break;
+      }
+      
+      // Apply additional filters in a single pass
+      if (hasGenreFilter && book.genre != _selectedGenre) return false;
+      if (hasAuthorFilter && book.author != _selectedAuthor) return false;
+      if (hasNarratorFilter && book.narrator != _selectedNarrator) return false;
+      if (hasCompletedFilter && !book.isCompleted) return false;
+      if (hasFavoritesFilter && !book.isFavorite) return false;
+      
+      return true;
+    }).toList();
 
-    // Apply filter mode
-    switch (_filterMode) {
-      case 'continue':
-        filtered = filtered.where((book) => book.isStarted && !book.isCompleted).toList();
-        filtered.sort((a, b) {
-          final aTime = a.lastPlayedAt ?? DateTime(2000);
-          final bTime = b.lastPlayedAt ?? DateTime(2000);
-          return bTime.compareTo(aTime);
-        });
-        break;
-      case 'favorites':
-        filtered = filtered.where((book) => book.isFavorite).toList();
-        break;
-      case 'completed':
-        filtered = filtered.where((book) => book.isCompleted).toList();
-        break;
-      case 'recent':
-        filtered = filtered.where((book) => book.lastPlayedAt != null).toList();
-        filtered.sort((a, b) {
-          final aTime = a.lastPlayedAt ?? DateTime(2000);
-          final bTime = b.lastPlayedAt ?? DateTime(2000);
-          return bTime.compareTo(aTime);
-        });
-        break;
-    }
-
-    // Apply additional filters
-    if (_selectedGenre.isNotEmpty) {
-      filtered = filtered.where((book) => book.genre == _selectedGenre).toList();
-    }
-    if (_selectedAuthor.isNotEmpty) {
-      filtered = filtered.where((book) => book.author == _selectedAuthor).toList();
-    }
-    if (_selectedNarrator.isNotEmpty) {
-      filtered = filtered.where((book) => book.narrator == _selectedNarrator).toList();
-    }
-    if (_showCompleted && _filterMode != 'completed') {
-      filtered = filtered.where((book) => book.isCompleted).toList();
-    }
-    if (_showFavorites && _filterMode != 'favorites') {
-      filtered = filtered.where((book) => book.isFavorite).toList();
+    // Sort if needed based on filter mode
+    if (_filterMode == 'continue' || _filterMode == 'recent') {
+      filtered.sort((a, b) {
+        final aTime = a.lastPlayedAt ?? DateTime(2000);
+        final bTime = b.lastPlayedAt ?? DateTime(2000);
+        return bTime.compareTo(aTime);
+      });
     }
 
     return filtered;
