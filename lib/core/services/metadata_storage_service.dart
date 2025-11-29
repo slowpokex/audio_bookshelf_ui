@@ -4,14 +4,22 @@ import 'package:path/path.dart' as path;
 
 /// Service for storing and retrieving local metadata for audio files.
 /// Uses an in-memory cache to reduce file I/O operations.
+///
+/// **Thread Safety Note:** This service uses static mutable state for caching.
+/// It is designed for single-threaded use within Flutter's main isolate.
+/// If used in multiple isolates, each isolate will have its own cache instance,
+/// which is the expected behavior for Dart isolates.
 class MetadataStorageService {
   static const String _metadataFileName = 'metadata.json';
   
-  // In-memory cache for metadata to avoid repeated file I/O
-  // Key is the directory path, value is the parsed metadata map
+  // In-memory cache for metadata to avoid repeated file I/O.
+  // Note: Safe for single-threaded use in Flutter's main isolate.
+  // Each Dart isolate has its own memory, so no cross-isolate races occur.
+  // Key is the directory path, value is the parsed metadata map.
   static final Map<String, Map<String, dynamic>> _metadataCache = {};
   
-  // Track cache modification times to detect stale cache
+  // Track cache modification times to detect stale cache.
+  // Same thread-safety considerations as _metadataCache.
   static final Map<String, DateTime> _cacheTimestamps = {};
   
   /// Maximum cache age before refresh (5 minutes)
@@ -100,6 +108,10 @@ class MetadataStorageService {
   
   /// Retrieves metadata for an audio file.
   /// Uses cache to minimize disk reads.
+  ///
+  /// Returns `null` if metadata doesn't exist or cannot be read.
+  /// Errors are logged but don't interrupt the calling code, as missing
+  /// metadata should not prevent audio file processing.
   static Future<AudioFileMetadata?> getMetadata(String audioFilePath) async {
     try {
       final metadataDir = path.dirname(audioFilePath);
@@ -113,7 +125,10 @@ class MetadataStorageService {
       
       return null;
     } catch (e) {
-      // Silently return null on error to avoid blocking
+      // Log error but return null to avoid blocking file processing.
+      // Expected errors: file not found, permission denied, invalid JSON.
+      // These are non-fatal and the caller should handle null metadata gracefully.
+      print('MetadataStorageService.getMetadata: Failed to retrieve metadata for $audioFilePath: $e');
       return null;
     }
   }

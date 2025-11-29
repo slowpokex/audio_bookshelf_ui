@@ -28,7 +28,13 @@ class AudiobookCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Use BlocSelector to only rebuild when the playing state for this
-    // specific audiobook changes, rather than on every audio player state change
+    // specific audiobook changes, rather than on every audio player state change.
+    // The selector returns a boolean indicating if THIS audiobook is currently playing.
+    // This means the card only rebuilds when:
+    // 1. This audiobook starts playing (false -> true)
+    // 2. This audiobook stops playing (true -> false)
+    // Other audiobooks starting/stopping won't trigger rebuilds since the
+    // boolean value returned by the selector remains the same (false).
     return BlocSelector<AudioPlayerBloc, AudioPlayerState, bool>(
       selector: (state) => state.currentAudiobook?.id == audiobook.id && state.isPlaying,
       builder: (context, isCurrentlyPlaying) {

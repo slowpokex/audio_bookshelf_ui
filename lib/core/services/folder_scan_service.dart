@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:path/path.dart' as path;
 import 'metadata_storage_service.dart';
 
@@ -44,9 +45,7 @@ class FolderScanService {
     
     // Process in batches to avoid overwhelming the system
     for (int i = 0; i < audioFilePaths.length; i += _maxParallelTasks) {
-      final end = (i + _maxParallelTasks > audioFilePaths.length) 
-          ? audioFilePaths.length 
-          : i + _maxParallelTasks;
+      final end = math.min(i + _maxParallelTasks, audioFilePaths.length);
       final batch = audioFilePaths.sublist(i, end);
       
       // Process batch in parallel
